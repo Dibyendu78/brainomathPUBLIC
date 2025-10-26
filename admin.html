@@ -598,9 +598,9 @@ select:focus {
 <script>
 const API = location.origin.includes('localhost') ? 'https://brain-o-math-olympiad.onrender.com/api' : '/api';
 let token = localStorage.getItem('bomAdminToken');
-//if (!token) {
-  //window.location.href = '/admin-login.html';
-//}
+if (!token) {
+  window.location.href = '/admin-login.html';
+}
 
 const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
 const qs = (sel) => document.querySelector(sel);
