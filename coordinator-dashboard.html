@@ -1418,7 +1418,10 @@
                     <ol style="padding-left: var(--space-5); line-height: 1.8;">
                         <p>1. Click the "Pay via UPI" button below to open your UPI app OR scan the QR code below</p>
                         <p>2. Complete the payment using any UPI app (GPay, PhonePe, Paytm, etc.)</p>
-                        <p>3. Upload the Payment Receipt/Screenshot below and submit your registration</p>
+                        <p>3.Enter your UTR (Unique Transaction Reference) number below exactly as shown on your payment
+                            receipt, then submit your registration form.
+                            Please double-check your UTR for accuracy.
+                            Only registrations with valid UTRs will be processed.</p>
                     </ol>
                 </div>
 
@@ -1499,7 +1502,8 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h3 class="success-title">Payment Submitted Successfully!</h3>
-                    <p>Your registration is now complete and waiting for admin verification. Please check your email.</p>
+                    <p>Your registration is now complete and waiting for admin verification. Please check your email.
+                    </p>
                     <div class="registration-id">
                         <strong>Registration ID: <span id="registrationId"></span></strong>
                     </div>
@@ -1540,8 +1544,8 @@
         const API = 'https://brain-o-math-olympiad.onrender.com/api';
 
         //const API = location.origin.includes('localhost')
-           // ? 'https://brain-o-math-olympiad.onrender.com/api'
-            //: '/api';
+        // ? 'https://brain-o-math-olympiad.onrender.com/api'
+        //: '/api';
         const UPI_ID = 'krishnendupatra57@paytm';
         const PAYEE_NAME = 'Brain-O-Math Olympiad 2025';
 
@@ -1694,17 +1698,53 @@
             const coordinatorData = JSON.parse(localStorage.getItem('coordinatorData') || '{}');
             const transactionNote = `Brain-O-Math Olympiad 2025 Registration - ${coordinatorData.schoolName || 'School'}`;
 
+            // Create UPI link with proper format
+            // Format: upi://pay?pa=<UPI_ID>&pn=<PAYEE_NAME>&am=<AMOUNT>&cu=<CURRENCY>&tn=<TRANSACTION_NOTE>
             const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+
+            console.log('🔗 UPI Link generated:', upiLink);
+            console.log('💰 Amount:', amount);
 
             const button = document.getElementById('upiPaymentLink');
             if (button) {
-                button.onclick = function () {
-                    if (/Android/i.test(navigator.userAgent)) {
+                button.onclick = function (e) {
+                    e.preventDefault();
+
+                    console.log('🔘 UPI Payment button clicked');
+                    console.log('🔗 Final UPI Link:', upiLink);
+
+                    // Detect mobile device
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                    console.log('📱 Is Mobile:', isMobile);
+
+                    if (isMobile) {
+                        // Try to open UPI app
+                        console.log('📱 Opening UPI app with amount:', amount);
+                        
+                        // Method 1: Direct navigation
                         window.location.href = upiLink;
+                        
+                        // Fallback after 2 seconds
+                        setTimeout(() => {
+                            const result = confirm('If the UPI app didn\'t open automatically, please:\n\n1. Use the QR code below\n2. Or manually send ₹' + amount + ' to ' + UPI_ID);
+                            if (!result) {
+                                // Scroll to QR code
+                                window.scrollTo({ top: document.querySelector('.payment-card').scrollHeight, behavior: 'smooth' });
+                            }
+                        }, 2000);
                     } else {
-                        alert('UPI apps can only be triggered from mobile devices. Please use the QR code instead.');
+                        // For desktop
+                        alert('UPI payment is only available on mobile devices.\n\nPlease:\n1. Open this page on your mobile phone\n2. Or use the QR code below\n3. Or send ₹' + amount + ' to ' + UPI_ID);
+
+                        // Scroll to QR code
+                        setTimeout(() => {
+                            window.scrollTo({ top: document.querySelector('.payment-card').scrollHeight, behavior: 'smooth' });
+                        }, 100);
                     }
                 };
+            } else {
+                console.error('❌ UPI Payment button not found!');
             }
         }
 
