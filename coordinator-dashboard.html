@@ -2416,11 +2416,9 @@
 
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    isPaymentSubmitted = true;
-                    registrationData.paymentStatus = 'submitted';
-                    registrationData.utr = data.data.utr;
-                    updateLockState();
-                    updatePaymentSection();
+                    // Auto-refresh dashboard to update all UI elements (locks registration, updates stats, etc.)
+                    await loadDashboard();
+                    
                     alert(`Payment UTR submitted successfully! Your UTR: ${data.data.utr}`);
                 } else {
                     alert(data.message || 'Payment submission failed');
