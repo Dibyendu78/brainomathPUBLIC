@@ -1064,7 +1064,7 @@
 
 
                     <div class="hero-buttons">
-                        <a href="signup.html" class="cta-button">Register Now</a>
+                        <a href="signup.html" class="cta-button" id="registerNowBtn1">Register Now</a>
                         <a href="coordinator-login.html" class="cta-button">Login</a>
                         <a href="https://drive.google.com/uc?export=download&id=1iJsnjVIiDhXC_5GsbWwpoTsPvnLByygL"
                             class="cta-button secondary">Download Handbook</a>
@@ -1527,7 +1527,7 @@
                     <a href="#details">Exam Details</a>
                     <a href="#awards">Awards</a>
                     <a href="#contact">Contact</a>
-                    <a href="signup.html">Register Now</a>
+                    <a href="signup.html" id="registerNowBtn2">Register Now</a>
                 </div>
                 <div class="footer-section">
                     <h4>Contact Info</h4>
@@ -1640,6 +1640,54 @@
         });
 
         console.log('Brain-O-Math Olympiad 2025 - Website Loaded Successfully! 🎯');
+
+        // Check registration status and handle Register Now links
+        const API = 'https://brain-o-math.onrender.com/api';
+        //const API = location.origin.includes('localhost') ? 'https://brain-o-math-olympiad.onrender.com/api' : '/api';
+
+        async function checkRegistrationStatus() {
+            try {
+                const res = await fetch(API + '/public/registration-status');
+                const data = await res.json();
+                
+                if (data.success && !data.data.isOpen) {
+                    // Registration is closed
+                    const registerBtn1 = document.getElementById('registerNowBtn1');
+                    const registerBtn2 = document.getElementById('registerNowBtn2');
+                    
+                    // Add click handlers to show alert and prevent navigation
+                    const handleRegisterClick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert('Registration is currently closed. Registration is no longer available. Please check back later or contact the organizing team for more information.');
+                        return false;
+                    };
+                    
+                    // Style the links to show they're disabled
+                    if (registerBtn1) {
+                        registerBtn1.style.opacity = '0.6';
+                        registerBtn1.style.cursor = 'not-allowed';
+                        registerBtn1.title = 'Registration is currently closed';
+                        registerBtn1.href = '#';
+                        registerBtn1.addEventListener('click', handleRegisterClick);
+                    }
+                    
+                    if (registerBtn2) {
+                        registerBtn2.style.opacity = '0.6';
+                        registerBtn2.style.cursor = 'not-allowed';
+                        registerBtn2.title = 'Registration is currently closed';
+                        registerBtn2.href = '#';
+                        registerBtn2.addEventListener('click', handleRegisterClick);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to check registration status:', error);
+                // If check fails, allow registration (default behavior)
+            }
+        }
+
+        // Check registration status on page load
+        checkRegistrationStatus();
     </script>
 </body>
 

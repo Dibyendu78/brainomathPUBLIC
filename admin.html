@@ -472,6 +472,28 @@ select:focus {
       </div>
     </div>
 
+    <!-- Registration Control Section -->
+    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <h2 style="color: white; margin-bottom: 1rem;">
+        <i class="fas fa-toggle-on"></i> Registration Control
+      </h2>
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div style="flex: 1;">
+          <p style="margin: 0; font-size: 0.95rem; opacity: 0.95;">
+            Current Status: <strong id="registrationStatusText">Checking...</strong>
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button id="stopRegistrationBtn" class="btn btn-danger" style="background: #ef4444;">
+            <i class="fas fa-stop-circle"></i> Stop Registration
+          </button>
+          <button id="startRegistrationBtn" class="btn btn-success" style="background: #10b981; display: none;">
+            <i class="fas fa-play-circle"></i> Start Registration
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab Navigation -->
     <div class="tab-nav">
       <button class="tab-btn active" data-tab="registrations">
@@ -983,9 +1005,99 @@ qs('#logoutBtn').onclick = () => {
   window.location.href = '/admin-login.html';
 };
 
+// Registration Control Functions
+let registrationStatus = 'open';
+
+async function loadRegistrationStatus() {
+  try {
+    const res = await fetch(API + '/admin/registration-status', { headers: headers() });
+    const j = await res.json();
+    if (j.success) {
+      registrationStatus = j.data.status;
+      updateRegistrationUI();
+    }
+  } catch (e) {
+    console.error('Failed to load registration status:', e);
+  }
+}
+
+function updateRegistrationUI() {
+  const statusText = qs('#registrationStatusText');
+  const stopBtn = qs('#stopRegistrationBtn');
+  const startBtn = qs('#startRegistrationBtn');
+  
+  if (registrationStatus === 'closed') {
+    statusText.textContent = 'CLOSED';
+    statusText.style.color = '#ef4444';
+    stopBtn.style.display = 'none';
+    startBtn.style.display = 'inline-flex';
+  } else {
+    statusText.textContent = 'OPEN';
+    statusText.style.color = '#10b981';
+    stopBtn.style.display = 'inline-flex';
+    startBtn.style.display = 'none';
+  }
+}
+
+async function stopRegistration() {
+  if (!confirm('Are you sure you want to stop registration? This will disable the "Register Now" link on the homepage.')) {
+    return;
+  }
+  
+  try {
+    const res = await fetch(API + '/admin/registration-status', {
+      method: 'PUT',
+      headers: headers(),
+      body: JSON.stringify({ status: 'closed' })
+    });
+    
+    const j = await res.json();
+    if (j.success) {
+      registrationStatus = 'closed';
+      updateRegistrationUI();
+      alert('Registration has been stopped successfully!');
+    } else {
+      alert('Failed to stop registration: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Failed to stop registration');
+    console.error(e);
+  }
+}
+
+async function startRegistration() {
+  if (!confirm('Are you sure you want to start registration? This will enable the "Register Now" link on the homepage.')) {
+    return;
+  }
+  
+  try {
+    const res = await fetch(API + '/admin/registration-status', {
+      method: 'PUT',
+      headers: headers(),
+      body: JSON.stringify({ status: 'open' })
+    });
+    
+    const j = await res.json();
+    if (j.success) {
+      registrationStatus = 'open';
+      updateRegistrationUI();
+      alert('Registration has been started successfully!');
+    } else {
+      alert('Failed to start registration: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Failed to start registration');
+    console.error(e);
+  }
+}
+
+qs('#stopRegistrationBtn').onclick = stopRegistration;
+qs('#startRegistrationBtn').onclick = startRegistration;
+
 // Initialize
 loadStats();
 loadRegs();
+loadRegistrationStatus();
 </script>
 </body>
 </html>
