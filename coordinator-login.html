@@ -651,7 +651,7 @@
 
     <!-- Footer Section -->
     <div class="back-link">
-      <a href="signup.html">
+      <a href="signup.html" id="signupLink">
         <i class="fas fa-arrow-left"></i>
         Back to Registration
       </a>
@@ -1041,6 +1041,38 @@
       passwordInput.value = numericData;
       updateSecurityIndicator(numericData);
     });
+
+    // Check registration status and block signup link if closed
+    async function checkRegistrationStatusForSignup() {
+      try {
+        const res = await fetch(API + '/public/registration-status');
+        const data = await res.json();
+        
+        const signupLink = document.getElementById('signupLink');
+        
+        if (data.success && !data.data.isOpen) {
+          // Registration is closed - block the link
+          signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Registration is currently closed. Registration is no longer available. Please check back later or contact the organizing team for more information.');
+            return false;
+          });
+          
+          // Style the link to show it's disabled
+          signupLink.style.opacity = '0.6';
+          signupLink.style.cursor = 'not-allowed';
+          signupLink.title = 'Registration is currently closed';
+          signupLink.href = '#';
+        }
+      } catch (error) {
+        console.error('Failed to check registration status:', error);
+        // If check fails, allow navigation (default behavior)
+      }
+    }
+
+    // Check registration status on page load
+    checkRegistrationStatusForSignup();
   </script>
 </body>
 

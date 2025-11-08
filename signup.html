@@ -476,6 +476,20 @@
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Check registration status before proceeding
+      try {
+        const statusRes = await fetch(API + '/public/registration-status');
+        const statusData = await statusRes.json();
+        
+        if (statusData.success && !statusData.data.isOpen) {
+          showAlert('Registration is currently closed. Registration is no longer available. Please check back later or contact the organizing team for more information.', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Failed to check registration status:', error);
+        // Continue with submission if check fails
+      }
+
       // Quick validation
       let isValid = true;
       const formData = {};
@@ -531,6 +545,35 @@
       showAlert('Already logged in. Redirecting...', 'success');
       setTimeout(() => window.location.href = 'coordinator-dashboard.html', 1500);
     }
+
+    // Check registration status on page load
+    async function checkRegistrationStatus() {
+      try {
+        const res = await fetch(API + '/public/registration-status');
+        const data = await res.json();
+        
+        if (data.success && !data.data.isOpen) {
+          // Registration is closed - disable form and show message
+          signupForm.style.opacity = '0.6';
+          signupForm.style.pointerEvents = 'none';
+          signupBtn.disabled = true;
+          
+          showAlert('Registration is currently closed. Registration is no longer available. Please check back later or contact the organizing team for more information.', 'error');
+          
+          // Disable all form inputs
+          const inputs = signupForm.querySelectorAll('input, button, select');
+          inputs.forEach(input => {
+            input.disabled = true;
+          });
+        }
+      } catch (error) {
+        console.error('Failed to check registration status:', error);
+        // If check fails, allow registration (default behavior)
+      }
+    }
+
+    // Check registration status on page load
+    checkRegistrationStatus();
   </script>
 </body>
 </html>
