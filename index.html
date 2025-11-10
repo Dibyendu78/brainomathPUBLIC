@@ -26,8 +26,7 @@
     <link rel="icon" type="image/png" href="/favicon-256.png" />
     <link rel="apple-touch-icon" href="/favicon-256.png" />
 
-    <!-- PWA manifest (helps Google detect icons) -->
-    <link rel="manifest" href="/site.webmanifest" />
+    <!-- PWA manifest removed intentionally to avoid install prompts -->
 
     <!-- Organization schema (logo for brand/knowledge panel) -->
     <script type="application/ld+json">
@@ -1929,6 +1928,14 @@
                 if(e.key === 'Escape' && panel.classList.contains('open')) closePanel();
             });
         })();
+    </script>
+    <!-- Disable PWA: unregister any existing service workers -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+                regs.forEach(function (r) { r.unregister(); });
+            }).catch(function(){});
+        }
     </script>
 </body>
 
