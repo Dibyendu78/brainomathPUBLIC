@@ -3,42 +3,48 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brain-O-Math | Online Mathematics Olympiad</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>Brain-O-Math | Mathematics/Science Olympiad</title>
     <meta name="description"
-        content="Brain-O-Math is an online platform for Math Olympiads and registrations. Join now!">
+        content="Brain-O-Math  for Math / Science Olympiads and registrations. Join now!" />
     <meta name="keywords"
-        content="Brain-O-Math, Math Olympiad, Online Math Competition, School Olympiad, Mathematics Quiz">
+        content="Brain-O-Math, Math Olympiad, Science / Math Competition,Inter School Olympiad,Science / Mathematics " />
+    <link rel="canonical" href="https://brainomath.online/" />
 
-    <!-- Open Graph tags (for social preview) -->
-    <meta property="og:title" content="Brain-O-Math Olympiad">
+    <!-- Social preview -->
+    <meta property="og:title" content="Brain-O-Math Olympiad" />
     <meta property="og:description"
-        content="Register now for the Brain-O-Math Olympiad — an interactive math competition platform for students.">
-    <meta property="og:url" content="https://brainomath.online">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://brainomath.online/logo.png">
+        content="Register now for the Brain-O-Math Olympiad — an interactive math/science competition platform for students." />
+    <meta property="og:url" content="https://brainomath.online" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://brainomath.online/favicon-512.png" />
 
-    <!-- Favicon and app icon -->
-    <link rel="icon" href="https://brainomath.online/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="https://brainomath.online/logo.png" />
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon-256.png" />
+    <link rel="apple-touch-icon" href="/favicon-256.png" />
 
-    
+    <!-- PWA manifest (helps Google detect icons) -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Organization schema (logo for brand/knowledge panel) -->
     <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Brain-O-Math",
-    "url": "https://brainomath.online",
-    "logo": "https://brainomath.online/logo.png",
-    "sameAs": [
-      "https://www.instagram.com/brainomath",
-      "https://www.facebook.com/brainomath",
-      "https://www.youtube.com/@brainomath"
-    ]
-  }
-  </script>
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Brain-O-Math",
+  "url": "https://brainomath.online",
+  "logo": "https://brainomath.online/favicon-512.png",
+  "sameAs": [
+    "https://www.instagram.com/brainomath",
+    "https://www.facebook.com/brainomath",
+    "https://www.youtube.com/@brainomath"
+  ]
+}
+</script>
+
     <style>
         * {
             margin: 0;
@@ -1449,7 +1455,7 @@
                         </div>
                         <div class="exam-detail">
                             <strong>Phone/WhatsApp:</strong><br>
-                            
+
                             +91 80019 54918<br>
                             +91 73846 87034
                         </div>
@@ -1562,7 +1568,7 @@
     </footer>
 
     <script>
-        
+
         const hamburger = document.getElementById('hamburger');
         const navLinks = document.getElementById('navLinks');
 
@@ -1647,12 +1653,12 @@
             try {
                 const res = await fetch(API + '/public/registration-status');
                 const data = await res.json();
-                
+
                 if (data.success && !data.data.isOpen) {
                     // Registration is closed
                     const registerBtn1 = document.getElementById('registerNowBtn1');
                     const registerBtn2 = document.getElementById('registerNowBtn2');
-                    
+
                     // Add click handlers to show alert and prevent navigation
                     const handleRegisterClick = (e) => {
                         e.preventDefault();
@@ -1660,7 +1666,7 @@
                         alert('Registration is currently closed. Registration is no longer available. Please check back later or contact the organizing team for more information.');
                         return false;
                     };
-                    
+
                     // Style the links to show they're disabled
                     if (registerBtn1) {
                         registerBtn1.style.opacity = '0.6';
@@ -1669,7 +1675,7 @@
                         registerBtn1.href = '#';
                         registerBtn1.addEventListener('click', handleRegisterClick);
                     }
-                    
+
                     if (registerBtn2) {
                         registerBtn2.style.opacity = '0.6';
                         registerBtn2.style.cursor = 'not-allowed';
