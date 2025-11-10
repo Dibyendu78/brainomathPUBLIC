@@ -1016,6 +1016,51 @@
             }
         }
     </style>
+    <!-- Minimal WhatsApp FAB (no JS, direct link) -->
+    <style>
+        .wa-fab{
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: #25D366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,.18);
+            z-index: 1200;
+            text-decoration: none;
+        }
+        .wa-fab img{
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+        @media (hover: hover){
+            .wa-fab{ transition: transform .2s ease; }
+            .wa-fab:hover{ transform: translateY(-2px); }
+        }
+        .wa-help{
+            position: fixed;
+            bottom: 86px;
+            right: 22px;
+            background: #1f2937; /* slate-800 */
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.18);
+            z-index: 1200;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        @media (hover: hover){
+            .wa-help{ transition: transform .2s ease, opacity .2s ease; }
+            .wa-help:hover{ transform: translateY(-2px); opacity: .95; }
+        }
+    </style>
 </head>
 
 <body>
@@ -1693,6 +1738,11 @@
         // Check registration status on page load
         checkRegistrationStatus();
     </script>
+    <!-- Single WhatsApp floating button (direct message link) -->
+    <a class="wa-help" href="https://wa.me/917384687034?text=Hi%20I%27d%20like%20to%20know%20more%20about%20Brain-O-Math." target="_blank" rel="noopener" aria-label="Any help? Chat on WhatsApp">Any help?</a>
+    <a class="wa-fab" href="https://wa.me/917384687034?text=Hi%20I%27d%20like%20to%20know%20more%20about%20Brain-O-Math." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    </a>
 </body>
 
 </html>
