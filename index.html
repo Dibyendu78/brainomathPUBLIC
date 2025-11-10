@@ -1016,6 +1016,132 @@
             }
         }
     </style>
+    <!-- ===== Floating contact buttons & sliding chat box CSS ===== -->
+    <style>
+        /* --- base FAB styles --- */
+        .fab{
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,.18);
+            z-index: 1200;
+            transform-origin: center;
+            cursor: pointer;
+        }
+        .fab svg, .fab img{ width: 22px; height: 22px; display:block; }
+        /* --- bounce animation --- */
+        @keyframes subtleBounce {
+            0%   { transform: translateY(0); }
+            50%  { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+        .fab.bouncy{
+            animation: subtleBounce 2.4s ease-in-out infinite;
+        }
+        /* --- WhatsApp style (pill) --- */
+        .fab-whatsapp{ background: #25D366; }
+        .fab-whatsapp .label{ margin-right: 6px; }
+        /* --- Gmail style (pill) --- */
+        .fab-gmail{ background: #D44638; }
+        /* Default visibility: show Gmail, hide WhatsApp on desktop */
+        .fab-whatsapp{ display: none; }
+        .fab-gmail{ display: inline-flex; }
+        /* Mobile: switch — show WhatsApp, hide Gmail */
+        @media (max-width: 767px){
+            .fab-whatsapp{ display: inline-flex; }
+            .fab-gmail{ display: none; }
+        }
+        /* --- Sliding chat box --- */
+        .chat-panel {
+            position: fixed;
+            bottom: 86px; /* sits above fab */
+            right: 22px;
+            width: 320px;
+            max-width: calc(100% - 44px);
+            height: 420px;
+            max-height: 70vh;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+            overflow: hidden;
+            z-index: 1199;
+            transform: translateY(20px) scale(.98);
+            opacity: 0;
+            transition: transform .32s cubic-bezier(.2,.9,.3,1), opacity .28s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,.06);
+        }
+        .chat-panel.open{
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .chat-header {
+            background: linear-gradient(90deg,#25D366,#0bb75a);
+            color: white;
+            padding: 12px 14px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        .chat-header .title { font-weight:700; }
+        .chat-body {
+            padding: 12px;
+            flex:1;
+            overflow:auto;
+            background: linear-gradient(#fbfbfb,#fff);
+        }
+        .chat-footer {
+            padding: 12px;
+            border-top: 1px solid #eee;
+            display:flex;
+            gap:8px;
+        }
+        .chat-footer input[type="text"]{
+            flex:1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline:none;
+        }
+        .chat-footer button{
+            background:#25D366;
+            color:#fff;
+            border:none;
+            padding:8px 12px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+        /* small view: make panel full width + taller */
+        @media (max-width:480px){
+            .chat-panel {
+                right: 12px;
+                left: 12px;
+                width: auto;
+                bottom: 80px;
+            }
+        }
+        /* small decoration for a quick "open externally" CTA */
+        .chat-open-wa {
+            margin-top:8px;
+            display:block;
+            text-align:center;
+            background:#0b8f3a;
+            color:#fff;
+            padding:8px 10px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+        }
+    </style>
 </head>
 
 <body>
@@ -1692,6 +1818,117 @@
 
         // Check registration status on page load
         checkRegistrationStatus();
+    </script>
+    <!-- ===== Floating contact buttons & sliding chat box HTML ===== -->
+    <!-- Gmail (desktop) -->
+    <a href="mailto:brainomathorg@gmail.com?subject=Website%20Inquiry" class="fab fab-gmail" aria-label="Email us">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" width="22" height="22">
+            <path d="M3 7.5 12 13.5 21 7.5V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5z" fill="#EA4335"/>
+            <path d="M21 6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2l9 6 9-6z" fill="#FFC107"/>
+        </svg>
+        <span class="label">Email Us</span>
+    </a>
+    <!-- WhatsApp (mobile) + opens our sliding chat panel on click -->
+    <a class="fab fab-whatsapp bouncy" id="waFab" aria-label="WhatsApp us" role="button">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+        <span class="label">WhatsApp Us</span>
+    </a>
+    <!-- Sliding chat panel (initially hidden) -->
+    <div class="chat-panel" id="waChatPanel" role="dialog" aria-hidden="true">
+        <div class="chat-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" style="width:28px;height:28px;border-radius:6px;background:#fff;padding:4px"/>
+            <div>
+                <div class="title">Chat with us</div>
+                <div style="font-size:12px;opacity:.9">Usually replies in a few minutes</div>
+            </div>
+            <div style="margin-left:auto">
+                <button id="closeChatBtn" aria-label="Close chat" style="background:transparent;border:none;color:rgba(255,255,255,.95);font-weight:700;cursor:pointer">✕</button>
+            </div>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div style="font-size:13px;color:#444;line-height:1.4">
+                Hi 👋 — Send us a message and we'll reply on WhatsApp.
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                <button class="quick" data-msg="I'd like to fill up offline.">Offline fill-up</button>
+                <button class="quick" data-msg="How can I pay online?">How to pay online</button>
+                <button class="quick" data-msg="I have an issue. Can you help?">Any issue types</button>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Write a quick message..." aria-label="Type a message"/>
+            <button id="sendToWa">Open in WhatsApp</button>
+        </div>
+        <a id="openExternWa" class="chat-open-wa" href="#" target="_blank" rel="noopener">Open chat in WhatsApp</a>
+    </div>
+    <!-- ===== JS: toggles panel, builds wa.me link with typed message ===== -->
+    <script>
+        (function(){
+            // CONFIG
+            const WA_NUMBER = '917384687034'; // country code + number, no + or spaces
+            const PRESET_MSG = "Hi, I'm interested in your classes.";
+            // elements
+            const waFab = document.getElementById('waFab');
+            const panel = document.getElementById('waChatPanel');
+            const closeBtn = document.getElementById('closeChatBtn');
+            const chatInput = document.getElementById('chatInput');
+            const sendToWa = document.getElementById('sendToWa');
+            const openExternWa = document.getElementById('openExternWa');
+            const quickBtns = document.querySelectorAll('.quick');
+            // open panel helper
+            function openPanel(){
+                panel.classList.add('open');
+                panel.setAttribute('aria-hidden','false');
+                setTimeout(()=> chatInput.focus(), 200);
+            }
+            // close panel helper
+            function closePanel(){
+                panel.classList.remove('open');
+                panel.setAttribute('aria-hidden','true');
+            }
+            // show panel on FAB click (mobile)
+            waFab && waFab.addEventListener('click', function(){
+                openPanel();
+            });
+            closeBtn && closeBtn.addEventListener('click', closePanel);
+            // quick buttons fill input
+            quickBtns.forEach(b => b.addEventListener('click', () => {
+                chatInput.value = b.dataset.msg;
+                chatInput.focus();
+                updateExternalLink();
+            }));
+            // build wa.me link
+            function buildWaLink(msg){
+                const txt = encodeURIComponent(msg || PRESET_MSG);
+                return `https://wa.me/${WA_NUMBER}?text=${txt}`;
+            }
+            // update external link whenever input changes
+            function updateExternalLink(){
+                const msg = (chatInput && chatInput.value ? chatInput.value.trim() : '') || PRESET_MSG;
+                if (openExternWa) openExternWa.href = buildWaLink(msg);
+            }
+            chatInput && chatInput.addEventListener('input', updateExternalLink);
+            // initial set
+            updateExternalLink();
+            // send button opens WhatsApp in new tab
+            sendToWa && sendToWa.addEventListener('click', function(){
+                const msg = (chatInput && chatInput.value ? chatInput.value.trim() : '') || PRESET_MSG;
+                const url = buildWaLink(msg);
+                window.open(url, '_blank', 'noopener');
+            });
+            // allow clicking the 'Open in WhatsApp' link to also close panel
+            openExternWa && openExternWa.addEventListener('click', () => closePanel());
+            // close panel when clicking outside (optional)
+            document.addEventListener('click', function(e){
+                if (!panel.contains(e.target) && !waFab.contains(e.target)) {
+                    if(panel.classList.contains('open')) closePanel();
+                }
+            });
+            // Accessibility: close on Escape
+            document.addEventListener('keydown', function(e){
+                if(e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+            });
+        })();
     </script>
 </body>
 
