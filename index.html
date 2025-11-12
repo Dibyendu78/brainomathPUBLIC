@@ -1061,6 +1061,47 @@
             .wa-help:hover{ transform: translateY(-2px); opacity: .95; }
         }
     </style>
+    <!-- Alert banner styles -->
+    <style>
+        .site-alert {
+            background: linear-gradient(90deg,#f97316,#f59e0b);
+            color: #07102a;
+            padding: 14px 18px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.05rem;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(249,115,22,0.15);
+            z-index: 1300;
+        }
+
+        .site-alert small {
+            display: block;
+            font-weight: 600;
+            margin-top: 4px;
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+
+        .site-alert .close-btn {
+            position: absolute;
+            right: 12px;
+            top: 8px;
+            background: rgba(0,0,0,0.06);
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            color: #07102a;
+        }
+
+        @media (max-width: 480px){
+            .site-alert { font-size: 0.95rem; padding: 12px 12px; }
+            .site-alert .close-btn { width: 30px; height: 30px; right: 8px; top: 6px; }
+        }
+    </style>
 </head>
 
 <body>
@@ -1070,9 +1111,15 @@
     <!-- Header -->
     <div class="header-top">
         <div class="container">
-            <marquee>REGISTRATIONS OPEN FOR INTERSCHOOL BRAIN-O-MATH OLYMPIAD 2025 | ORGANIZED BY DOON HERITAGE
-                SCHOOL, SILIGURI | EXAM DATE: 22nd NOVEMBER 2025 </marquee>
+            <marquee>REGISTRATION EXTENDED: 18 NOVEMBER 2025 | ADMIT CARD RELEASE: 20 NOVEMBER 2025 | EXAM DATE: 22nd NOVEMBER 2025</marquee>
         </div>
+    </div>
+
+    <!-- Prominent site-wide announcement (dismissible for the session) -->
+    <div class="site-alert" id="siteAlert" role="status" aria-live="polite">
+        Registration deadline extended to <strong>18 November 2025</strong>. Admit card will be released on <strong>20 November 2025</strong> — please plan accordingly.
+        <small>Click the × button to dismiss this message for your session.</small>
+        <button class="close-btn" id="alertCloseBtn" aria-label="Dismiss announcement">×</button>
     </div>
 
     <header>
@@ -1184,8 +1231,8 @@
 
                         <div class="update-card fade-in-up">
                             <h3>📅 IMPORTANT DATES</h3>
-                            <p><strong>Registration Deadline:</strong> 15th November 2025<br>
-                                <strong>Admit Card Release:</strong> 18th November 2025<br>
+                            <p><strong>Registration Deadline:</strong> 18th November 2025<br>
+                                <strong>Admit card Release:</strong> 20th November 2025<br>
                                 <strong>Exam Date:</strong> Saturday, 22nd November 2025<br>
                                 <strong>Result Declaration:</strong> 16th December 2025
                             </p>
@@ -1383,10 +1430,10 @@
                             <strong>Exam Date:</strong> Saturday, 22nd November 2025
                         </div>
                         <div class="exam-detail">
-                            <strong>Registration Deadline:</strong> 15th November 2025
+                            <strong>Registration Deadline:</strong> 18th November 2025
                         </div>
                         <div class="exam-detail">
-                            <strong>Admit Card Release:</strong> 18th November 2025
+                            <strong>Admit card Release:</strong> 20th November 2025
                         </div>
                         <div class="exam-detail">
                             <strong>Result Declaration:</strong> 16th December 2025
@@ -1589,8 +1636,8 @@
                 </div>
                 <div class="footer-section">
                     <h4>Important Dates</h4>
-                    <p>Registration Deadline: 15th November 2025</p>
-                    <p>Admit Card Release: 18th November 2025</p>
+                    <p>Registration Deadline: 18th November 2025</p>
+                    <p>Admit card Release: 20th November 2025</p>
                     <p>Exam Date: 22nd November 2025</p>
                     <p>Result Declaration: 16th December 2025</p>
                     <p>Awards Distribution: 18th December 2025</p>
@@ -1737,6 +1784,28 @@
 
         // Check registration status on page load
         checkRegistrationStatus();
+
+        // Announcement banner dismissal (keeps dismissed for the session)
+        (function () {
+            const alertEl = document.getElementById('siteAlert');
+            const closeBtn = document.getElementById('alertCloseBtn');
+            try {
+                const dismissed = sessionStorage.getItem('siteAlertDismissed_v1');
+                if (dismissed === '1' && alertEl) {
+                    alertEl.style.display = 'none';
+                }
+
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        if (alertEl) alertEl.style.display = 'none';
+                        try { sessionStorage.setItem('siteAlertDismissed_v1', '1'); } catch (e) { /* ignore */ }
+                    });
+                }
+            } catch (e) {
+                // sessionStorage might be blocked; silently fail
+                console.warn('Could not access sessionStorage for alert dismissal');
+            }
+        })();
     </script>
     <!-- Single WhatsApp floating button (direct message link) -->
     <a class="wa-help" href="https://wa.me/917384687034?text=Hi%20I%27d%20like%20to%20know%20more%20about%20Brain-O-Math." target="_blank" rel="noopener" aria-label="Any help? Chat on WhatsApp">Any help?</a>
