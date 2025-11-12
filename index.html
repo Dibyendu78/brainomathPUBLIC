@@ -1086,20 +1086,44 @@
         .site-alert .close-btn {
             position: absolute;
             right: 12px;
-            top: 8px;
-            background: rgba(0,0,0,0.06);
-            border: none;
-            width: 34px;
-            height: 34px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.15);
+            border: 2px solid #07102a;
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 800;
+            font-size: 24px;
             color: #07102a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .site-alert .close-btn:hover {
+            background: rgba(0,0,0,0.25);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .site-alert .close-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        @media (max-width: 768px){
+            .site-alert { font-size: 0.95rem; padding: 16px 50px 16px 18px; }
+            .site-alert small { font-size: 0.9rem; margin-top: 2px; }
+            .site-alert .close-btn { width: 44px; height: 44px; right: 10px; font-size: 26px; }
         }
 
         @media (max-width: 480px){
-            .site-alert { font-size: 0.95rem; padding: 12px 12px; }
-            .site-alert .close-btn { width: 30px; height: 30px; right: 8px; top: 6px; }
+            .site-alert { font-size: 0.9rem; padding: 14px 50px 14px 16px; }
+            .site-alert small { font-size: 0.85rem; }
+            .site-alert .close-btn { width: 42px; height: 42px; right: 8px; font-size: 24px; }
         }
     </style>
 </head>
