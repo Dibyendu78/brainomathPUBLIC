@@ -502,9 +502,6 @@ select:focus {
       <button class="tab-btn" data-tab="students">
         <i class="fas fa-user-graduate"></i> Student Management
       </button>
-      <button class="tab-btn" data-tab="admit-cards">
-        <i class="fas fa-id-card"></i> Admit Card Management
-      </button>
     </div>
 
     <!-- Registration Management Tab -->
@@ -615,60 +612,6 @@ select:focus {
         </div>
         
         <div class="pagination" id="studentPager"></div>
-      </div>
-    </div>
-
-    <!-- Admit Card Management Tab -->
-    <div id="admit-cards" class="tab-content">
-      <div class="card">
-        <h2><i class="fas fa-id-card"></i> Admit Card Management</h2>
-        
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
-          <h3 style="margin-top: 0; color: white; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-info-circle"></i> Release Admit Cards
-          </h3>
-          <p style="margin: 0.5rem 0; opacity: 0.95;">
-            Select registrations below and click the "Release Admit Card" button to enable coordinators to download admit cards for their students.
-          </p>
-        </div>
-
-        <div class="controls">
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-            <button id="releaseAdmitCardBtn" class="btn" style="background: #10b981;">
-              <i class="fas fa-download"></i> Release Admit Card
-            </button>
-            <button id="releaseAllAdmitCardsBtn" class="btn" style="background: #f59e0b;">
-              <i class="fas fa-download"></i> Release All Admit Cards
-            </button>
-            <button id="refreshAdmitCardsBtn" class="btn">
-              <i class="fas fa-sync-alt"></i> Refresh
-            </button>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <table id="admitCardTable">
-            <thead>
-              <tr>
-                <th><input type="checkbox" id="selectAllAdmitCards" style="cursor: pointer;"></th>
-                <th><i class="fas fa-hashtag"></i> Registration ID</th>
-                <th><i class="fas fa-school"></i> School</th>
-                <th><i class="fas fa-user-tie"></i> Coordinator</th>
-                <th><i class="fas fa-user-graduate"></i> Students Count</th>
-                <th><i class="fas fa-rupee-sign"></i> Amount</th>
-                <th><i class="fas fa-flag"></i> Payment Status</th>
-                <th><i class="fas fa-id-card"></i> Admit Card Status</th>
-                <th><i class="fas fa-calendar"></i> Released Date</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <div id="admitCardMessage" style="text-align: center; padding: 2rem; color: #6b7280;">
-          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-          <p>Loading admit card data...</p>
-        </div>
       </div>
     </div>
   </main>
@@ -1148,163 +1091,6 @@ async function startRegistration() {
   }
 }
 
-// Admit Card Management Functions
-let selectedAdmitCards = new Set();
-
-async function loadAdmitCardStatus() {
-  try {
-    const res = await fetch(API + '/admin/admit-cards/status', { headers: headers() });
-    const j = await res.json();
-
-    if (!j.success) {
-      qs('#admitCardMessage').innerHTML = '<p style="color: #ef4444;">Failed to load admit card data</p>';
-      return;
-    }
-
-    const tbody = qs('#admitCardTable tbody');
-    tbody.innerHTML = '';
-
-    if (!j.data || j.data.length === 0) {
-      qs('#admitCardMessage').innerHTML = '<p>No registrations found</p>';
-      return;
-    }
-
-    qs('#admitCardMessage').style.display = 'none';
-    qs('#admitCardTable').style.display = 'table';
-
-    j.data.forEach(reg => {
-      const tr = document.createElement('tr');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.style.cursor = 'pointer';
-      checkbox.value = reg._id;
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          selectedAdmitCards.add(reg._id);
-        } else {
-          selectedAdmitCards.delete(reg._id);
-        }
-      });
-
-      const statusBadge = reg.admitCardReleased 
-        ? `<span class="status verified"><i class="fas fa-check-circle"></i> Released</span>`
-        : `<span class="status pending"><i class="fas fa-clock"></i> Pending</span>`;
-
-      const releasedDate = reg.admitCardReleasedAt 
-        ? new Date(reg.admitCardReleasedAt).toLocaleDateString()
-        : 'N/A';
-
-      tr.innerHTML = `
-        <td>${checkbox.outerHTML}</td>
-        <td><strong>${reg.registrationId}</strong></td>
-        <td>${reg.school?.schoolName || 'N/A'}</td>
-        <td>${reg.school?.coordinatorName || 'N/A'}</td>
-        <td>${reg.students?.length || 0}</td>
-        <td>₹${reg.totalAmount || 0}</td>
-        <td><span class="status ${reg.paymentStatus || 'pending'}">${(reg.paymentStatus || 'pending').toUpperCase()}</span></td>
-        <td>${statusBadge}</td>
-        <td>${releasedDate}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-  } catch (error) {
-    console.error('Load admit card status error:', error);
-    qs('#admitCardMessage').innerHTML = '<p style="color: #ef4444;">Error loading data</p>';
-  }
-}
-
-async function releaseSelectedAdmitCards() {
-  if (selectedAdmitCards.size === 0) {
-    alert('Please select at least one registration');
-    return;
-  }
-
-  if (!confirm(`Release admit cards for ${selectedAdmitCards.size} registration(s)?`)) {
-    return;
-  }
-
-  try {
-    const res = await fetch(API + '/admin/admit-cards/release', {
-      method: 'POST',
-      headers: headers(),
-      body: JSON.stringify({
-        registrationIds: Array.from(selectedAdmitCards)
-      })
-    });
-
-    const j = await res.json();
-
-    if (j.success) {
-      alert(`Admit cards released for ${j.data.modifiedCount} registration(s)`);
-      selectedAdmitCards.clear();
-      loadAdmitCardStatus();
-    } else {
-      alert('Failed to release admit cards: ' + (j.message || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Release admit cards error:', error);
-    alert('Failed to release admit cards');
-  }
-}
-
-async function releaseAllAdmitCards() {
-  if (!confirm('Release admit cards for ALL registrations? This action cannot be undone.')) {
-    return;
-  }
-
-  try {
-    // Get all registration IDs first
-    const res = await fetch(API + '/admin/admit-cards/status', { headers: headers() });
-    const j = await res.json();
-
-    if (!j.success || !j.data) {
-      alert('Failed to fetch registrations');
-      return;
-    }
-
-    const allIds = j.data.map(reg => reg._id);
-
-    const releaseRes = await fetch(API + '/admin/admit-cards/release', {
-      method: 'POST',
-      headers: headers(),
-      body: JSON.stringify({
-        registrationIds: allIds
-      })
-    });
-
-    const releaseJ = await releaseRes.json();
-
-    if (releaseJ.success) {
-      alert(`Admit cards released for ${releaseJ.data.modifiedCount} registration(s)`);
-      selectedAdmitCards.clear();
-      loadAdmitCardStatus();
-    } else {
-      alert('Failed to release admit cards: ' + (releaseJ.message || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Release all admit cards error:', error);
-    alert('Failed to release admit cards');
-  }
-}
-
-// Select All Admit Cards
-qs('#selectAllAdmitCards').addEventListener('change', (e) => {
-  document.querySelectorAll('#admitCardTable tbody input[type="checkbox"]').forEach(cb => {
-    cb.checked = e.target.checked;
-    if (e.target.checked) {
-      selectedAdmitCards.add(cb.value);
-    } else {
-      selectedAdmitCards.delete(cb.value);
-    }
-  });
-});
-
-// Button Event Listeners
-qs('#releaseAdmitCardBtn').onclick = releaseSelectedAdmitCards;
-qs('#releaseAllAdmitCardsBtn').onclick = releaseAllAdmitCards;
-qs('#refreshAdmitCardsBtn').onclick = loadAdmitCardStatus;
-
 qs('#stopRegistrationBtn').onclick = stopRegistration;
 qs('#startRegistrationBtn').onclick = startRegistration;
 
@@ -1312,10 +1098,6 @@ qs('#startRegistrationBtn').onclick = startRegistration;
 loadStats();
 loadRegs();
 loadRegistrationStatus();
-
-// Load admit cards when clicking the tab
-document.querySelector('[data-tab="admit-cards"]').addEventListener('click', loadAdmitCardStatus);
 </script>
 </body>
 </html>
-
