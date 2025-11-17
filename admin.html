@@ -348,6 +348,19 @@ select:focus {
   border-color: #667eea;
 }
 
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f0f0f0;
+  border-color: #ddd;
+  color: #999;
+}
+
+.pagination button:disabled:hover {
+  background: #f0f0f0;
+  border-color: #ddd;
+}
+
 .utr-number {
   font-family: 'Courier New', monospace;
   font-weight: 600;
@@ -1412,12 +1425,55 @@ async function loadAdmitCards() {
       tbody.appendChild(tr);
     });
 
-    // Pagination
+    // Smart Pagination - Show Previous/Next + limited page numbers
     const totalPages = j.pagination?.pages || j.totalPages || 1;
     const pager = qs('#admitCardPager');
     pager.innerHTML = '';
     
-    for (let i = 1; i <= totalPages; i++) {
+    // Calculate range of page numbers to show (max 5 pages at a time)
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, admitCardPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    // Adjust start if we're near the end
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    // Previous button
+    const prevBtn = document.createElement('button');
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+    prevBtn.disabled = admitCardPage === 1;
+    prevBtn.onclick = () => {
+      if (admitCardPage > 1) {
+        admitCardPage--;
+        loadAdmitCards();
+      }
+    };
+    pager.appendChild(prevBtn);
+    
+    // Show "1" if not in range
+    if (startPage > 1) {
+      const btn1 = document.createElement('button');
+      btn1.textContent = '1';
+      btn1.onclick = () => {
+        admitCardPage = 1;
+        loadAdmitCards();
+      };
+      pager.appendChild(btn1);
+      
+      if (startPage > 2) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+    }
+    
+    // Page numbers in range
+    for (let i = startPage; i <= endPage; i++) {
       const btn = document.createElement('button');
       btn.textContent = i;
       btn.className = i === admitCardPage ? 'active' : '';
@@ -1427,6 +1483,48 @@ async function loadAdmitCards() {
       };
       pager.appendChild(btn);
     }
+    
+    // Show last page if not in range
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+      
+      const btnLast = document.createElement('button');
+      btnLast.textContent = totalPages;
+      btnLast.onclick = () => {
+        admitCardPage = totalPages;
+        loadAdmitCards();
+      };
+      pager.appendChild(btnLast);
+    }
+    
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = admitCardPage === totalPages;
+    nextBtn.onclick = () => {
+      if (admitCardPage < totalPages) {
+        admitCardPage++;
+        loadAdmitCards();
+      }
+    };
+    pager.appendChild(nextBtn);
+    
+    // Page info
+    const pageInfo = document.createElement('div');
+    pageInfo.style.width = '100%';
+    pageInfo.style.textAlign = 'center';
+    pageInfo.style.marginTop = '10px';
+    pageInfo.style.fontSize = '0.9rem';
+    pageInfo.style.color = '#666';
+    pageInfo.innerHTML = `Page <strong>${admitCardPage}</strong> of <strong>${totalPages}</strong> | Total Students: <strong>${j.pagination?.total || j.count}</strong>`;
+    pager.appendChild(pageInfo);
   } catch (e) {
     console.error('Load admit cards error:', e);
     tbody.innerHTML = `
