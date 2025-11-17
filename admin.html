@@ -1413,7 +1413,7 @@ async function loadAdmitCards() {
     });
 
     // Pagination
-    const totalPages = j.totalPages || 1;
+    const totalPages = j.pagination?.pages || j.totalPages || 1;
     const pager = qs('#admitCardPager');
     pager.innerHTML = '';
     
