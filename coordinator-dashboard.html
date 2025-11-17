@@ -1279,11 +1279,11 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label required" for="parentName">
+                            <label class="form-label" for="parentName">
                                 <i class="fas fa-user-friends"></i>
-                                Parent's Name
+                                Parent's Name (optional)
                             </label>
-                            <input class="form-input" id="parentName" placeholder="Enter parent's name">
+                            <input class="form-input" id="parentName" placeholder="Enter parent's name (optional)">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="parentContact">
@@ -1536,82 +1536,6 @@
             </div>
         </div>
 
-        <!-- Admit Card Download Section -->
-        <div style="margin-top: var(--space-12);">
-            <div class="payment-card" id="admitCardSection" style="display: none;">
-                <div class="payment-header">
-                    <h3><i class="fas fa-id-card"></i> Admit Card Download</h3>
-                    <p>Download admit cards for your registered students</p>
-                </div>
-
-                <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; border-radius: var(--radius-lg); padding: var(--space-6); margin-bottom: var(--space-6);">
-                    <p style="margin: 0; color: rgba(255, 255, 255, 0.95); display: flex; align-items: center; gap: var(--space-2);">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Admit cards are available for download!</strong> Each student will receive their individual admit card with all necessary information.
-                    </p>
-                </div>
-
-                <!-- Students List for Admit Card Download -->
-                <div id="admitCardStudentsList" style="margin-bottom: var(--space-8);">
-                    <h4 style="color: white; margin-bottom: var(--space-6); display: flex; align-items: center; gap: var(--space-2);">
-                        <i class="fas fa-user-graduate"></i>
-                        <span>Your Registered Students</span>
-                        <span id="admitCardStudentCount" style="background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 0.25rem 0.75rem; font-size: 0.85rem;">0</span>
-                    </h4>
-
-                    <div id="admitCardLoadingMessage" style="text-align: center; padding: var(--space-6); color: rgba(255, 255, 255, 0.7);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: var(--space-2);"></i>
-                        <p>Loading students...</p>
-                    </div>
-
-                    <div id="admitCardStudentsContainer" style="display: none;">
-                        <table style="width: 100%; border-collapse: collapse; background: transparent;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid rgba(255, 255, 255, 0.2);">
-                                    <th style="padding: var(--space-4); text-align: left; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        <i class="fas fa-hashtag"></i> Student ID
-                                    </th>
-                                    <th style="padding: var(--space-4); text-align: left; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        <i class="fas fa-user"></i> Name
-                                    </th>
-                                    <th style="padding: var(--space-4); text-align: left; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        <i class="fas fa-graduation-cap"></i> Class
-                                    </th>
-                                    <th style="padding: var(--space-4); text-align: left; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        <i class="fas fa-book"></i> Subject(s)
-                                    </th>
-                                    <th style="padding: var(--space-4); text-align: center; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        <i class="fas fa-download"></i> Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="admitCardStudentsBody">
-                                <!-- Students will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="admitCardEmptyMessage" style="text-align: center; padding: var(--space-8); color: rgba(255, 255, 255, 0.6); display: none;">
-                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: var(--space-2); opacity: 0.5;"></i>
-                        <p>No students found</p>
-                    </div>
-                </div>
-
-                <!-- Bulk Download Button -->
-                <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
-                    <button id="downloadAllAdmitCardsBtn" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); flex: 1; min-width: 200px;">
-                        <i class="fas fa-download"></i>
-                        Download All Admit Cards (PDF)
-                    </button>
-                    <button id="refreshAdmitCardsBtn" class="btn" style="background: rgba(255, 255, 255, 0.2); flex: 1; min-width: 200px;">
-                        <i class="fas fa-sync-alt"></i>
-                        Refresh
-                    </button>
-                </div>
-
-                <div id="admitCardMessage" style="margin-top: var(--space-6); padding: var(--space-4); border-radius: var(--radius-lg); text-align: center; display: none;"></div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -2134,7 +2058,7 @@
             const parentName = document.getElementById('parentName').value.trim();
             const parentContact = document.getElementById('parentContact').value.trim();
 
-            if (!name || !cls || !subjects || !parentName) {
+            if (!name || !cls || !subjects) {
                 alert('Please fill all required fields');
                 return;
             }
@@ -2517,174 +2441,7 @@
             document.getElementById('studentCategory').value = getCategory(this.value);
         });
 
-        // ===============================
-        // Admit Card Management Functions
-        // ===============================
-        async function loadAdmitCardStudents() {
-            try {
-                const response = await fetch(`${API}/coordinator/registration`, { headers: headers() });
-                if (!response.ok) {
-                    throw new Error('Failed to load registration data');
-                }
-
-                const data = await response.json();
-                if (!data.success || !data.data) {
-                    throw new Error('No registration data found');
-                }
-
-                const students = data.data.students || [];
-                const studentCount = document.getElementById('admitCardStudentCount');
-                studentCount.textContent = students.length;
-
-                const loadingMsg = document.getElementById('admitCardLoadingMessage');
-                const container = document.getElementById('admitCardStudentsContainer');
-                const emptyMsg = document.getElementById('admitCardEmptyMessage');
-                const tbody = document.getElementById('admitCardStudentsBody');
-
-                if (students.length === 0) {
-                    loadingMsg.style.display = 'none';
-                    container.style.display = 'none';
-                    emptyMsg.style.display = 'block';
-                    return;
-                }
-
-                // Populate table
-                tbody.innerHTML = '';
-                students.forEach(student => {
-                    const subjectText = student.subjects === 'both' ? 'Mathematics & Science' : 
-                                       student.subjects === 'math' ? 'Mathematics' : 'Science';
-                    
-                    const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
-                    tr.innerHTML = `
-                        <td style="padding: var(--space-4); color: white;">
-                            <strong>${student.studentId || 'N/A'}</strong>
-                        </td>
-                        <td style="padding: var(--space-4); color: white;">
-                            ${student.name || 'N/A'}
-                        </td>
-                        <td style="padding: var(--space-4); color: white;">
-                            Class ${student.class || 'N/A'}
-                        </td>
-                        <td style="padding: var(--space-4); color: white;">
-                            ${subjectText}
-                        </td>
-                        <td style="padding: var(--space-4); text-align: center;">
-                            <button class="btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="downloadAdmitCardForStudent('${student._id}')">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                loadingMsg.style.display = 'none';
-                emptyMsg.style.display = 'none';
-                container.style.display = 'block';
-
-            } catch (error) {
-                console.error('Load admit card students error:', error);
-                document.getElementById('admitCardLoadingMessage').innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: var(--space-2);"></i>
-                    <p>Failed to load students</p>
-                `;
-            }
-        }
-
-        async function downloadAdmitCardForStudent(studentId) {
-            try {
-                const response = await fetch(`${API}/coordinator/admit-cards/download/${studentId}`, {
-                    headers: headers()
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to download admit card');
-                }
-
-                // Get the PDF blob and download it
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `admit-card-${studentId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-                showAdmitCardMessage('success', 'Admit card downloaded successfully!');
-            } catch (error) {
-                console.error('Download admit card error:', error);
-                showAdmitCardMessage('error', error.message || 'Failed to download admit card. Please try again.');
-            }
-        }
-
-        async function downloadAllAdmitCards() {
-            try {
-                const response = await fetch(`${API}/coordinator/admit-cards/download-all`, {
-                    headers: headers()
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to download admit cards');
-                }
-
-                // Get the PDF blob and download it
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `admit-cards-${new Date().getTime()}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-                showAdmitCardMessage('success', 'All admit cards downloaded successfully!');
-            } catch (error) {
-                console.error('Download all admit cards error:', error);
-                showAdmitCardMessage('error', error.message || 'Failed to download admit cards. Please try again.');
-            }
-        }
-
-        function showAdmitCardMessage(type, message) {
-            const msgEl = document.getElementById('admitCardMessage');
-            msgEl.style.display = 'block';
-            msgEl.style.background = type === 'success' 
-                ? 'rgba(16, 185, 129, 0.2)' 
-                : 'rgba(239, 68, 68, 0.2)';
-            msgEl.style.borderLeft = `4px solid ${type === 'success' ? '#10b981' : '#ef4444'}`;
-            msgEl.style.color = type === 'success' ? '#d1fae5' : '#fee2e2';
-            msgEl.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                ${message}
-            `;
-
-            setTimeout(() => {
-                msgEl.style.display = 'none';
-            }, 5000);
-        }
-
-        function checkAndShowAdmitCardSection() {
-            // Check if admit cards are released
-            if (registrationData && registrationData.admitCardReleased) {
-                document.getElementById('admitCardSection').style.display = 'block';
-                loadAdmitCardStudents();
-            } else {
-                document.getElementById('admitCardSection').style.display = 'none';
-            }
-        }
-
-        // Add event listeners for admit card buttons
-        if (document.getElementById('downloadAllAdmitCardsBtn')) {
-            document.getElementById('downloadAllAdmitCardsBtn').addEventListener('click', downloadAllAdmitCards);
-        }
-
-        if (document.getElementById('refreshAdmitCardsBtn')) {
-            document.getElementById('refreshAdmitCardsBtn').addEventListener('click', loadAdmitCardStudents);
-        }
+        // Admit card feature removed — related UI and scripts have been deleted.
 
         // ===============================
         // Logout Function
@@ -2702,12 +2459,7 @@
             loadDashboard();
         });
 
-        // Override loadDashboard to check admit card status
-        const originalLoadDashboard = loadDashboard;
-        loadDashboard = async function() {
-            await originalLoadDashboard();
-            checkAndShowAdmitCardSection();
-        };
+        // Dashboard initialization unchanged
 
     </script>
 </body>
