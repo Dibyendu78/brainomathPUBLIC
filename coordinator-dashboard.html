@@ -434,6 +434,70 @@
             transform: scale(1.05);
         }
 
+        .actions .download-btn {
+            background: var(--success);
+            color: var(--white);
+            padding: var(--space-1) var(--space-2);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: var(--text-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-weight: 500;
+        }
+
+        .actions .download-btn:hover {
+            background: var(--success-dark);
+            transform: scale(1.05);
+        }
+
+        .actions .download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-2);
+            align-items: center;
+        }
+
+        /* Roll Number and Admit Status Styles */
+        .roll-number {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-sm);
+            letter-spacing: 1px;
+        }
+
+        .admit-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            font-weight: 500;
+        }
+
+        .admit-status.released {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-dark);
+        }
+
+        .admit-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -1316,6 +1380,10 @@
                         <i class="fas fa-plus"></i>
                         Add Student
                     </button>
+                    <button class="btn btn-success" id="downloadAllAdmitCardsBtn" onclick="downloadAllAdmitCards()" style="display: none;">
+                        <i class="fas fa-download"></i>
+                        Download All Admit Cards
+                    </button>
                     <input type="text" id="searchInput" placeholder="Search by name or ID..." onkeyup="applyFilters()">
 
                     <select id="classFilter" onchange="applyFilters()">
@@ -1361,8 +1429,8 @@
                                     <th>Category</th>
                                     <th>Subjects</th>
                                     <th>Fee</th>
-                                    <th>Parent's Name</th>
-                                    <th>Parent's Contact</th>
+                                    <th>Roll Number</th>
+                                    <th>Admit Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -1542,11 +1610,8 @@
         // ===============================
         // Configuration
         // ===============================
+        //const API = 'http://localhost:5000/api';
         const API = 'https://brain-o-math.onrender.com/api';
-
-        //const API = location.origin.includes('localhost')
-        // ? 'https://brain-o-math-olympiad.onrender.com/api'
-        //: '/api';
         const UPI_ID = 'krishnendupatra57@okicici';
         const PAYEE_NAME = 'Brain-O-Math Olympiad 2025';
 
@@ -1606,6 +1671,13 @@
             } else {
                 addBtn.disabled = false;
                 addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Student';
+            }
+
+            // Update download all button visibility
+            const downloadAllBtn = document.getElementById('downloadAllAdmitCardsBtn');
+            if (downloadAllBtn) {
+                const hasReleasedAdmitCards = (allStudents || []).some(s => s.admitCardReleased);
+                downloadAllBtn.style.display = hasReleasedAdmitCards ? 'inline-flex' : 'none';
             }
         }
 
@@ -1836,8 +1908,13 @@
                     <td>Category ${student.category || '-'}</td>
                     <td>${formatSubjects(student.subjects || '-')}</td>
                     <td>₹${student.fee || 0}</td>
-                    <td>${student.parentName || '-'}</td>
-                    <td>${student.parentContact || '-'}</td>
+                    <td><span class="roll-number">${student.rollNumber || 'Not Assigned'}</span></td>
+                    <td>
+                        <span class="admit-status ${student.admitCardReleased ? 'released' : 'pending'}">
+                            <i class="fas ${student.admitCardReleased ? 'fa-check-circle' : 'fa-clock'}"></i>
+                            ${student.admitCardReleased ? 'Released' : 'Pending'}
+                        </span>
+                    </td>
                     <td class="actions">
                         ${canEdit ? `
                             <a class="edit-btn" href="#studentForm" onclick="editStudent(${student._idx})" title="Edit Student">
@@ -1848,9 +1925,17 @@
                                 <i class="fas fa-trash"></i>
                             </button>
                         ` : `
-                            <span style="color: var(--gray-500); font-size: var(--text-xs);">
-                                <i class="fas fa-lock"></i> Locked
-                            </span>
+                            <div class="action-buttons">
+                                ${student.admitCardReleased ? `
+                                    <button class="download-btn" onclick="downloadAdmitCard('${student._id || ''}')" title="Download Admit Card">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                ` : `
+                                    <span style="color: var(--gray-500); font-size: var(--text-xs);">
+                                        <i class="fas fa-lock"></i> Awaiting Release
+                                    </span>
+                                `}
+                            </div>
                         `}
                     </td>
                 </tr>
@@ -1892,6 +1977,111 @@
         function changePage(page) {
             currentPage = page;
             renderTable();
+        }
+
+        // ===============================
+        // Admit Card Functions
+        // ===============================
+        async function downloadAdmitCard(studentId) {
+            try {
+                if (!studentId) {
+                    alert('Student ID not found. Please refresh the page and try again.');
+                    return;
+                }
+
+                const button = event.target.closest('button') || event.target.closest('a');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                }
+
+                const response = await fetch(`${API}/coordinator/admit-cards/student/${studentId}`, {
+                    headers: headers(),
+                    method: 'GET'
+                });
+
+                if (response.ok) {
+                    // Get the blob from response
+                    const blob = await response.blob();
+                    
+                    // Create a temporary URL for the blob
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    // Create a temporary anchor element to trigger download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `admit-card-${studentId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Cleanup
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccessMessage('Admit card downloaded successfully!');
+                } else if (response.status === 403) {
+                    alert('Admit card has not been released yet. Please contact the administrator.');
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.message || 'Failed to download admit card'}`);
+                }
+
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-download"></i>';
+                }
+            } catch (error) {
+                console.error('Download Admit Card Error:', error);
+                alert('Failed to download admit card. Please try again.');
+                
+                const button = event.target.closest('button') || event.target.closest('a');
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-download"></i>';
+                }
+            }
+        }
+
+        async function downloadAllAdmitCards() {
+            try {
+                const button = event.target;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
+
+                const response = await fetch(`${API}/coordinator/admit-cards/download-all`, {
+                    headers: headers(),
+                    method: 'GET'
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `admit-cards-all-${new Date().getTime()}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccessMessage('All admit cards downloaded successfully!');
+                } else if (response.status === 404) {
+                    alert('No released admit cards found for your students.');
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.message || 'Failed to download admit cards'}`);
+                }
+
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-download"></i> Download All Admit Cards';
+            } catch (error) {
+                console.error('Download All Admit Cards Error:', error);
+                alert('Failed to download admit cards. Please try again.');
+                
+                const button = event.target;
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-download"></i> Download All Admit Cards';
+            }
         }
 
         // ===============================

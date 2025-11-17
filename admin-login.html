@@ -114,9 +114,8 @@
     })();
 
     // --- API Configuration ---
+    //const API = 'http://localhost:5000/api/admin';
     const API = 'https://brain-o-math.onrender.com/api/admin';
-
-    //const API = 'https://brain-o-math-olympiad.onrender.com/api/admin'; // ✅ Correct backend route
     const usernameEl = document.getElementById('username');
     const passwordEl = document.getElementById('password');
     const messageBox = document.getElementById('loginMessage');
@@ -146,10 +145,10 @@
           return;
         }
 
-        // ✅ Save token
+        //  Save token
         localStorage.setItem('bomAdminToken', data.token);
 
-        // ✅ Success message
+        //  Success message
         messageBox.className = 'success-msg';
         messageBox.textContent = 'Login successful! Redirecting...';
         setTimeout(() => (window.location.href = '/admin.html'), 700);

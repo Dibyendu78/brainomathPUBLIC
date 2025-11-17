@@ -257,6 +257,12 @@ button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
 .btn:hover {
@@ -266,6 +272,12 @@ button {
 
 .btn:active {
   transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-success {
@@ -388,6 +400,125 @@ select:focus {
   font-size: 0.8rem;
 }
 
+/* Status badge styles */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.released {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-badge.submitted {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-badge.verified {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.status-badge.rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+/* Payment status badges */
+.status-badge.payment-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-badge.payment-submitted {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-badge.payment-verified {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.status-badge.payment-rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.action-btn.release-btn {
+  background: #10b981;
+  color: white;
+}
+
+.action-btn.release-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.action-btn.revoke-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.action-btn.revoke-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   header {
@@ -409,7 +540,7 @@ select:focus {
   }
   
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
   
   .controls {
@@ -501,6 +632,9 @@ select:focus {
       </button>
       <button class="tab-btn" data-tab="students">
         <i class="fas fa-user-graduate"></i> Student Management
+      </button>
+      <button class="tab-btn" data-tab="admit-cards">
+        <i class="fas fa-id-card"></i> Admit Card Management
       </button>
     </div>
 
@@ -614,13 +748,102 @@ select:focus {
         <div class="pagination" id="studentPager"></div>
       </div>
     </div>
+
+    <!-- Admit Card Management Tab -->
+    <div id="admit-cards" class="tab-content">
+      <div class="card">
+        <h2><i class="fas fa-id-card"></i> Admit Card Management</h2>
+        
+        <div class="stats-grid" id="admitStatsContainer">
+          <div class="stat-box">
+            <div class="stat-value" id="totalStudentsAdmit">0</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="releasedAdmitCards">0</div>
+            <div class="stat-label">Admit Cards Released</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="pendingAdmitCards">0</div>
+            <div class="stat-label">Pending Release</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="releasePercentage">0%</div>
+            <div class="stat-label">Release Progress</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="releaseAllBtn" class="btn" style="background: #10b981; color: white;">
+            <i class="fas fa-check-circle"></i> Release All Admit Cards
+          </button>
+          <button id="refreshAdmitStatsBtn" class="btn" style="background: #3b82f6; color: white;">
+            <i class="fas fa-sync"></i> Refresh Stats
+          </button>
+        </div>
+
+        <div class="controls">
+          <div class="filter-group">
+            <label for="admitClassFilter">
+              <i class="fas fa-graduation-cap"></i> Filter by Class:
+            </label>
+            <select id="admitClassFilter">
+              <option value="">All Classes</option>
+              <option value="3">Class 3</option>
+              <option value="4">Class 4</option>
+              <option value="5">Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="card" style="background: #f9fafb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; color: #1f2937;"><i class="fas fa-download"></i> Export Admit Data</h3>
+          <div class="controls" style="gap: 10px; flex-wrap: wrap;">
+            <button id="exportCSVBtn" class="btn" style="background: #059669; color: white;">
+              <i class="fas fa-file-csv"></i> Export to CSV
+            </button>
+            <button id="exportExcelBtn" class="btn" style="background: #0891b2; color: white;">
+              <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table id="admitCardTable">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> ID</th>
+                <th><i class="fas fa-user"></i> Name</th>
+                <th><i class="fas fa-graduation-cap"></i> Class</th>
+                <th><i class="fas fa-id-card"></i> Roll Number</th>
+                <th><i class="fas fa-book"></i> Subjects</th>
+                <th><i class="fas fa-credit-card"></i> Payment</th>
+                <th><i class="fas fa-school"></i> School</th>
+                <th><i class="fas fa-flag"></i> Status</th>
+                <th><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="pagination" id="admitCardPager"></div>
+      </div>
+    </div>
   </main>
 </div>
 
 <script>
+//const API = 'http://localhost:5000/api';
 const API = 'https://brain-o-math.onrender.com/api';
-
-//const API = location.origin.includes('localhost') ? 'https://brain-o-math-olympiad.onrender.com/api' : '/api';
 let token = localStorage.getItem('bomAdminToken');
 if (!token) {
   window.location.href = '/admin-login.html';
@@ -644,6 +867,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       loadRegs();
     } else if (tabName === 'students') {
       loadStudents();
+    } else if (tabName === 'admit-cards') {
+      loadAdmitCardStats();
+      loadAdmitCards();
     }
   });
 });
@@ -704,15 +930,15 @@ async function loadRegs() {
         <td><span class="status ${r.paymentStatus || r.status}">${r.paymentStatus || r.status}</span></td>
         <td>
           <div class="action-buttons">
-            <button onclick="verifyUTR('${r.registrationId}')" class="btn btn-success" 
-              ${r.paymentStatus === 'verified' || r.status === 'approved' ? 'disabled' : ''}>
-              <i class="fas fa-check"></i> Verify
-            </button>
-            <button onclick="rejectUTR('${r.registrationId}')" class="btn btn-danger"
-              ${r.paymentStatus === 'rejected' || r.status === 'rejected' ? 'disabled' : ''}>
-              <i class="fas fa-times"></i> Reject
-            </button>
-            ${r.paymentStatus === 'rejected' || r.status === 'rejected' ? 
+            ${r.paymentStatus === 'verified' || r.paymentStatus === 'submitted' ? 
+              `<button onclick="verifyUTR('${r.registrationId}')" class="btn btn-success">
+                <i class="fas fa-check"></i> Verify
+              </button>` : ''}
+            ${r.paymentStatus !== 'rejected' ? 
+              `<button onclick="rejectUTR('${r.registrationId}')" class="btn btn-danger">
+                <i class="fas fa-times"></i> Reject
+              </button>` : ''}
+            ${r.paymentStatus === 'rejected' ? 
               `<button onclick="approveUTR('${r.registrationId}')" class="btn btn-warning">
                 <i class="fas fa-undo"></i> Approve
               </button>` : ''}
@@ -751,7 +977,7 @@ function pager(total) {
   }
 }
 
-// ✅ NEW: Verify UTR function
+//  NEW: Verify UTR function
 async function verifyUTR(registrationId) {
   if (!confirm(`Verify payment for registration ${registrationId}?`)) return;
   
@@ -783,7 +1009,7 @@ async function verifyUTR(registrationId) {
   }
 }
 
-// ✅ NEW: Reject UTR function
+//  NEW: Reject UTR function
 async function rejectUTR(registrationId) {
   const reason = prompt('Enter rejection reason:');
   if (!reason) return;
@@ -817,7 +1043,7 @@ async function rejectUTR(registrationId) {
   }
 }
 
-// ✅ NEW: Approve UTR function (for changing rejected back to approved)
+//  NEW: Approve UTR function (for changing rejected back to approved)
 async function approveUTR(registrationId) {
   if (!confirm(`Approve registration ${registrationId}? This will change it from rejected to approved.`)) return;
   
@@ -1094,10 +1320,272 @@ async function startRegistration() {
 qs('#stopRegistrationBtn').onclick = stopRegistration;
 qs('#startRegistrationBtn').onclick = startRegistration;
 
+// ===============================
+// ADMIT CARD MANAGEMENT
+// ===============================
+
+let admitCardPage = 1;
+let admitCardClassFilter = '';
+
+async function loadAdmitCardStats() {
+  try {
+    const res = await fetch(API + '/admin/admit-cards/stats', { headers: headers() });
+    const j = await res.json();
+    
+    if (j.success) {
+      const stats = j.data.summary;
+      qs('#totalStudentsAdmit').textContent = stats.totalStudents;
+      qs('#releasedAdmitCards').textContent = stats.released;
+      qs('#pendingAdmitCards').textContent = stats.pending;
+      qs('#releasePercentage').textContent = stats.percentage + '%';
+    }
+  } catch (e) {
+    console.error('Failed to load admit card stats:', e);
+  }
+}
+
+async function loadAdmitCards() {
+  const tbody = qs('#admitCardTable tbody');
+  tbody.innerHTML = '<tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+  try {
+    let url = `${API}/admin/students?page=${admitCardPage}`;
+    if (admitCardClassFilter) url += `&class=${admitCardClassFilter}`;
+    
+    const res = await fetch(url, { headers: headers() });
+    const j = await res.json();
+
+    tbody.innerHTML = '';
+
+    if (!j.data || j.data.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No students found</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    j.data.forEach(s => {
+      const tr = document.createElement('tr');
+      const statusClass = s.admitCardReleased ? 'released' : 'pending';
+      const statusText = s.admitCardReleased ? 'Released' : 'Pending';
+      
+      // Format subjects for display
+      let subjectsText = 'N/A';
+      if (s.subjects) {
+        if (s.subjects === 'both') subjectsText = 'Math & Science';
+        else if (s.subjects === 'math') subjectsText = 'Mathematics';
+        else if (s.subjects === 'science') subjectsText = 'Science';
+        else subjectsText = s.subjects;
+      }
+      
+      // Format payment status for display
+      let paymentStatusText = s.paymentStatus || 'pending';
+      let paymentBadgeClass = 'payment-' + paymentStatusText.toLowerCase();
+      let paymentDisplayText = paymentStatusText.charAt(0).toUpperCase() + paymentStatusText.slice(1);
+      
+      tr.innerHTML = `
+        <td><strong>${s.studentId || s._id.substring(0, 8)}</strong></td>
+        <td>${s.name}</td>
+        <td>Class ${s.class}</td>
+        <td><span style="font-family: monospace; font-weight: bold; color: #3b82f6;">${s.rollNumber || 'Not Assigned'}</span></td>
+        <td><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">${subjectsText}</span></td>
+        <td><span class="status-badge ${paymentBadgeClass}">${paymentDisplayText}</span></td>
+        <td>${s.school?.schoolName || 'N/A'}</td>
+        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        <td class="actions">
+          ${!s.admitCardReleased ? `
+            <button class="action-btn release-btn" onclick="releaseStudentAdmitCard('${s._id}')" title="Release Admit Card">
+              <i class="fas fa-check-circle"></i> Release
+            </button>
+          ` : `
+            <button class="action-btn revoke-btn" onclick="revokeStudentAdmitCard('${s._id}')" title="Revoke Admit Card">
+              <i class="fas fa-ban"></i> Revoke
+            </button>
+          `}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Pagination
+    const totalPages = j.totalPages || 1;
+    const pager = qs('#admitCardPager');
+    pager.innerHTML = '';
+    
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = i === admitCardPage ? 'active' : '';
+      btn.onclick = () => {
+        admitCardPage = i;
+        loadAdmitCards();
+      };
+      pager.appendChild(btn);
+    }
+  } catch (e) {
+    console.error('Load admit cards error:', e);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Failed to load students</p>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+async function releaseStudentAdmitCard(studentId) {
+  if (!confirm('Release admit card for this student?')) return;
+
+  try {
+    const res = await fetch(`${API}/admin/admit-cards/release/${studentId}`, {
+      method: 'POST',
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (j.success) {
+      alert(' Admit card released successfully!\n\nNotification email has been sent to the coordinator.');
+      loadAdmitCards();
+      loadAdmitCardStats();
+    } else {
+      alert('Failed to release admit card: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('Release error:', e);
+    alert('Failed to release admit card');
+  }
+}
+
+async function revokeStudentAdmitCard(studentId) {
+  if (!confirm('Revoke admit card for this student?')) return;
+
+  try {
+    const res = await fetch(`${API}/admin/admit-cards/revoke/${studentId}`, {
+      method: 'POST',
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (j.success) {
+      alert('Admit card revoked successfully!');
+      loadAdmitCards();
+      loadAdmitCardStats();
+    } else {
+      alert('Failed to revoke admit card: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('Revoke error:', e);
+    alert('Failed to revoke admit card');
+  }
+}
+
+async function releaseAllAdmitCards() {
+  if (!confirm('Release admit cards for ALL students? This action cannot be undone.')) return;
+
+  const btn = qs('#releaseAllBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+  try {
+    const res = await fetch(`${API}/admin/admit-cards/release-all`, {
+      method: 'POST',
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (j.success) {
+      alert(` Admit cards released for ${j.data.released} students!\n\n📧 Notification emails have been sent to all coordinators with instructions to download and distribute the admit cards.`);
+      loadAdmitCards();
+      loadAdmitCardStats();
+    } else {
+      alert('Failed to release admit cards: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('Batch release error:', e);
+    alert('Failed to release admit cards');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Release All Admit Cards';
+  }
+}
+
+// Event listeners for admit card management
+if (qs('#releaseAllBtn')) {
+  qs('#releaseAllBtn').onclick = releaseAllAdmitCards;
+}
+
+if (qs('#refreshAdmitStatsBtn')) {
+  qs('#refreshAdmitStatsBtn').onclick = loadAdmitCardStats;
+}
+
+if (qs('#admitClassFilter')) {
+  qs('#admitClassFilter').onchange = () => {
+    admitCardClassFilter = qs('#admitClassFilter').value;
+    admitCardPage = 1;
+    loadAdmitCards();
+  };
+}
+
+// Export to CSV
+async function exportToCSV() {
+  try {
+    const res = await fetch(`${API}/admin/students?page=1&limit=10000`, { headers: headers() });
+    const j = await res.json();
+    const students = j.data || [];
+    
+    if (students.length === 0) {
+      alert('No students to export');
+      return;
+    }
+    
+    let csv = 'Student ID,Name,Class,Roll Number,School,Status,Released Date\n';
+    students.forEach(s => {
+      const status = s.admitCardReleased ? 'Released' : 'Pending';
+      const date = s.admitCardReleasedAt ? new Date(s.admitCardReleasedAt).toLocaleDateString('en-IN') : 'N/A';
+      csv += `"${s.studentId || s._id.substring(0, 8)}","${s.name}","${s.class}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `admit-cards-${new Date().getTime()}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert(` Exported ${students.length} students to CSV`);
+  } catch (e) {
+    console.error('CSV export error:', e);
+    alert('Failed to export CSV');
+  }
+}
+
+// Export to Excel (using CSV as base - can be opened in Excel)
+function exportToExcel() {
+  exportToCSV(); // Same as CSV, will open in Excel
+}
+
+// Attach event listeners for export buttons
+if (qs('#exportCSVBtn')) {
+  qs('#exportCSVBtn').onclick = exportToCSV;
+}
+if (qs('#exportExcelBtn')) {
+  qs('#exportExcelBtn').onclick = exportToExcel;
+}
+
 // Initialize
 loadStats();
 loadRegs();
 loadRegistrationStatus();
+loadAdmitCardStats();
+loadAdmitCards();
 </script>
 </body>
 </html>
