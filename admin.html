@@ -979,15 +979,103 @@ async function loadRegs() {
 function pager(total) {
   const p = qs('#pager');
   p.innerHTML = '';
-  const pages = Math.ceil(total / 20);
+  const totalPages = Math.ceil(total / 20);
 
-  for (let i = 1; i <= pages; i++) {
+  // Smart Pagination - Show Previous/Next + limited page numbers
+  const maxPagesToShow = 5;
+  let startPage = Math.max(1, page - Math.floor(maxPagesToShow / 2));
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+  
+  // Adjust start if we're near the end
+  if (endPage - startPage + 1 < maxPagesToShow) {
+    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+  }
+  
+  // Previous button
+  const prevBtn = document.createElement('button');
+  prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+  prevBtn.disabled = page === 1;
+  prevBtn.onclick = () => {
+    if (page > 1) {
+      page--;
+      loadRegs();
+    }
+  };
+  p.appendChild(prevBtn);
+  
+  // Show "1" if not in range
+  if (startPage > 1) {
+    const btn1 = document.createElement('button');
+    btn1.textContent = '1';
+    btn1.onclick = () => {
+      page = 1;
+      loadRegs();
+    };
+    p.appendChild(btn1);
+    
+    if (startPage > 2) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      dots.style.padding = '8px 4px';
+      dots.style.display = 'flex';
+      dots.style.alignItems = 'center';
+      p.appendChild(dots);
+    }
+  }
+  
+  // Page numbers in range
+  for (let i = startPage; i <= endPage; i++) {
     const b = document.createElement('button');
     b.textContent = i;
-    b.onclick = () => { page = i; loadRegs() };
     if (i === page) b.classList.add('active');
+    b.onclick = () => {
+      page = i;
+      loadRegs();
+    };
     p.appendChild(b);
   }
+  
+  // Show last page if not in range
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      dots.style.padding = '8px 4px';
+      dots.style.display = 'flex';
+      dots.style.alignItems = 'center';
+      p.appendChild(dots);
+    }
+    
+    const btnLast = document.createElement('button');
+    btnLast.textContent = totalPages;
+    btnLast.onclick = () => {
+      page = totalPages;
+      loadRegs();
+    };
+    p.appendChild(btnLast);
+  }
+  
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+  nextBtn.disabled = page === totalPages;
+  nextBtn.onclick = () => {
+    if (page < totalPages) {
+      page++;
+      loadRegs();
+    }
+  };
+  p.appendChild(nextBtn);
+  
+  // Page info
+  const pageInfo = document.createElement('div');
+  pageInfo.style.width = '100%';
+  pageInfo.style.textAlign = 'center';
+  pageInfo.style.marginTop = '10px';
+  pageInfo.style.fontSize = '0.9rem';
+  pageInfo.style.color = '#666';
+  pageInfo.innerHTML = `Page <strong>${page}</strong> of <strong>${totalPages}</strong> | Total Registrations: <strong>${total}</strong>`;
+  p.appendChild(pageInfo);
 }
 
 //  NEW: Verify UTR function
@@ -1152,15 +1240,103 @@ async function loadStudents() {
 function studentPager(total) {
   const p = qs('#studentPager');
   p.innerHTML = '';
-  const pages = Math.ceil(total / 20);
+  const totalPages = Math.ceil(total / 20);
 
-  for (let i = 1; i <= pages; i++) {
+  // Smart Pagination - Show Previous/Next + limited page numbers
+  const maxPagesToShow = 5;
+  let startPage = Math.max(1, studentPage - Math.floor(maxPagesToShow / 2));
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+  
+  // Adjust start if we're near the end
+  if (endPage - startPage + 1 < maxPagesToShow) {
+    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+  }
+  
+  // Previous button
+  const prevBtn = document.createElement('button');
+  prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+  prevBtn.disabled = studentPage === 1;
+  prevBtn.onclick = () => {
+    if (studentPage > 1) {
+      studentPage--;
+      loadStudents();
+    }
+  };
+  p.appendChild(prevBtn);
+  
+  // Show "1" if not in range
+  if (startPage > 1) {
+    const btn1 = document.createElement('button');
+    btn1.textContent = '1';
+    btn1.onclick = () => {
+      studentPage = 1;
+      loadStudents();
+    };
+    p.appendChild(btn1);
+    
+    if (startPage > 2) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      dots.style.padding = '8px 4px';
+      dots.style.display = 'flex';
+      dots.style.alignItems = 'center';
+      p.appendChild(dots);
+    }
+  }
+  
+  // Page numbers in range
+  for (let i = startPage; i <= endPage; i++) {
     const b = document.createElement('button');
     b.textContent = i;
-    b.onclick = () => { studentPage = i; loadStudents() };
     if (i === studentPage) b.classList.add('active');
+    b.onclick = () => {
+      studentPage = i;
+      loadStudents();
+    };
     p.appendChild(b);
   }
+  
+  // Show last page if not in range
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      dots.style.padding = '8px 4px';
+      dots.style.display = 'flex';
+      dots.style.alignItems = 'center';
+      p.appendChild(dots);
+    }
+    
+    const btnLast = document.createElement('button');
+    btnLast.textContent = totalPages;
+    btnLast.onclick = () => {
+      studentPage = totalPages;
+      loadStudents();
+    };
+    p.appendChild(btnLast);
+  }
+  
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+  nextBtn.disabled = studentPage === totalPages;
+  nextBtn.onclick = () => {
+    if (studentPage < totalPages) {
+      studentPage++;
+      loadStudents();
+    }
+  };
+  p.appendChild(nextBtn);
+  
+  // Page info
+  const pageInfo = document.createElement('div');
+  pageInfo.style.width = '100%';
+  pageInfo.style.textAlign = 'center';
+  pageInfo.style.marginTop = '10px';
+  pageInfo.style.fontSize = '0.9rem';
+  pageInfo.style.color = '#666';
+  pageInfo.innerHTML = `Page <strong>${studentPage}</strong> of <strong>${totalPages}</strong> | Total Students: <strong>${total}</strong>`;
+  p.appendChild(pageInfo);
 }
 
 function formatSubjects(subjects) {
