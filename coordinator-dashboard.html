@@ -1621,6 +1621,7 @@
         let coordinatorToken = localStorage.getItem('coordinatorToken');
         let registrationData = null;
         let currentEditingStudent = null;
+        let currentEditingStudentId = null;  // For editing by ID after payment
         let isPaymentSubmitted = false;
 
         // Filtering and pagination
@@ -1926,6 +1927,11 @@
                             </button>
                         ` : `
                             <div class="action-buttons">
+                                ${!student.admitCardReleased ? `
+                                    <a class="edit-btn" href="#studentForm" onclick="editStudentById('${student._id || ''}', ${student._idx})" title="Edit Student Details">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                ` : ''}
                                 ${student.admitCardReleased ? `
                                     <button class="download-btn" onclick="downloadAdmitCard('${student._id || ''}')" title="Download Admit Card">
                                         <i class="fas fa-download"></i>
@@ -2197,6 +2203,38 @@
             currentEditingStudent = index;
         }
 
+        // Edit student by ID (after payment/registration)
+        function editStudentById(studentId, index) {
+            if (!studentId) {
+                alert('Student ID not found!');
+                return;
+            }
+
+            const student = allStudents[index];
+            if (!student) {
+                alert('Student not found!');
+                return;
+            }
+
+            const form = document.getElementById('studentForm');
+            const toolbar = document.getElementById('filterToolbar');
+            form.classList.remove('hidden');
+            toolbar.style.display = 'none';
+            document.getElementById('formTitle').textContent = 'Edit Student Details';
+            document.getElementById('saveButtonText').textContent = 'Update Student Details';
+
+            document.getElementById('studentName').value = student.name || '';
+            document.getElementById('studentClass').value = student.class || '';
+            document.getElementById('studentCategory').value = student.category || '';
+            document.getElementById('subjects').value = student.subjects || '';
+            document.getElementById('parentName').value = student.parentName || '';
+            document.getElementById('parentContact').value = student.parentContact || '';
+
+            // Store student ID for editing by ID
+            currentEditingStudentId = studentId;
+            currentEditingStudent = null;
+        }
+
         async function removeStudent(index) {
             if (isPaymentSubmitted) {
                 alert('Cannot remove students after payment is completed.');
@@ -2237,11 +2275,6 @@
 
         // ⭐ FIXED saveStudent function - Form stays open after saving
         async function saveStudent() {
-            if (isPaymentSubmitted) {
-                alert('Cannot modify students after payment is completed.');
-                return;
-            }
-
             const name = document.getElementById('studentName').value.trim();
             const cls = document.getElementById('studentClass').value;
             const subjects = document.getElementById('subjects').value;
@@ -2270,6 +2303,49 @@
             };
 
             try {
+                // Check if editing by ID (after payment)
+                if (currentEditingStudentId !== null) {
+                    const url = `${API}/coordinator/students/edit/${currentEditingStudentId}`;
+                    const response = await fetch(url, {
+                        method: 'PUT',
+                        headers: headers(),
+                        body: JSON.stringify(studentData)
+                    });
+
+                    if (response.ok) {
+                        // Update the local student data
+                        const studentIndex = allStudents.findIndex(s => s._id === currentEditingStudentId);
+                        if (studentIndex !== -1) {
+                            allStudents[studentIndex] = {
+                                ...allStudents[studentIndex],
+                                ...studentData
+                            };
+                        }
+
+                        clearForm();
+                        currentEditingStudentId = null;
+                        document.getElementById('formTitle').textContent = 'Student Details';
+                        document.getElementById('saveButtonText').textContent = 'Update';
+
+                        showSuccessMessage('Student details updated successfully!');
+                        updateStats();
+                        applyFilters();
+                        setTimeout(() => {
+                            cancelEdit();
+                        }, 500);
+                    } else {
+                        const error = await response.json();
+                        alert(error.message || 'Failed to update student');
+                    }
+                    return;
+                }
+
+                // Original logic for editing before payment
+                if (isPaymentSubmitted && currentEditingStudent === null) {
+                    alert('Cannot add students after payment is completed.');
+                    return;
+                }
+
                 const url = currentEditingStudent !== null
                     ? `${API}/coordinator/students/${currentEditingStudent}`
                     : `${API}/coordinator/students`;
@@ -2338,9 +2414,7 @@
         const submitBtn = document.getElementById('submitRegistration');
 
         let utr1Complete = false;
-        let utr2Complete = false;
-
-        // Helper Functions
+        let utr2Complete = false;        // Helper Functions
         function showUTRError(message) {
             utrErrorText.textContent = message;
             utrError.style.display = 'block';

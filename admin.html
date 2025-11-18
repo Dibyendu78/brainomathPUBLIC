@@ -786,10 +786,60 @@ select:focus {
           </div>
         </div>
 
+        <!-- Release Options -->
+        <div style="background: #e0f2fe; border: 1px solid #0284c7; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; color: #0c4a6e; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paper-plane"></i> Release Admit Cards
+          </h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+            <!-- Release All -->
+            <div style="border: 1px solid #06b6d4; border-radius: 6px; padding: 15px; background: white;">
+              <h4 style="margin: 0 0 10px 0; color: #0c4a6e;">
+                <i class="fas fa-globe"></i> Release All Students
+              </h4>
+              <p style="margin: 0 0 10px 0; color: #666; font-size: 0.9rem;">
+                Generate roll numbers and release admit cards for all pending students across all schools
+              </p>
+              <button id="releaseAllBtn" class="btn" style="background: #10b981; color: white; width: 100%; cursor: pointer;">
+                <i class="fas fa-check-circle"></i> Release All
+              </button>
+            </div>
+
+            <!-- Release by School -->
+            <div style="border: 1px solid #06b6d4; border-radius: 6px; padding: 15px; background: white;">
+              <h4 style="margin: 0 0 10px 0; color: #0c4a6e;">
+                <i class="fas fa-school"></i> Release by School
+              </h4>
+              <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <select id="schoolSelectForRelease" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                  <option value="">Select a school...</option>
+                </select>
+                <button id="releaseSchoolBtn" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px; cursor: pointer;">
+                  <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+              <small style="color: #666;">Select a school to release admit cards for its students only</small>
+            </div>
+
+            <!-- Release Individual Student -->
+            <div style="border: 1px solid #06b6d4; border-radius: 6px; padding: 15px; background: white;">
+              <h4 style="margin: 0 0 10px 0; color: #0c4a6e;">
+                <i class="fas fa-user-graduate"></i> Release Individual
+              </h4>
+              <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="text" id="studentSearchForRelease" placeholder="Search student..." 
+                       style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <button id="releaseIndividualBtn" class="btn" style="background: #8b5cf6; color: white; padding: 8px 16px; cursor: pointer;">
+                  <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+              <small style="color: #666;">Enter student name to release their admit card</small>
+            </div>
+          </div>
+        </div>
+
         <div class="controls">
-          <button id="releaseAllBtn" class="btn" style="background: #10b981; color: white;">
-            <i class="fas fa-check-circle"></i> Release All Admit Cards
-          </button>
           <button id="refreshAdmitStatsBtn" class="btn" style="background: #3b82f6; color: white;">
             <i class="fas fa-sync"></i> Refresh Stats
           </button>
@@ -812,6 +862,17 @@ select:focus {
               <option value="10">Class 10</option>
               <option value="11">Class 11</option>
               <option value="12">Class 12</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="admitStatusFilter">
+              <i class="fas fa-info-circle"></i> Filter by Status:
+            </label>
+            <select id="admitStatusFilter">
+              <option value="">All Status</option>
+              <option value="released">Released</option>
+              <option value="pending">Pending</option>
             </select>
           </div>
         </div>
@@ -1515,6 +1576,7 @@ qs('#startRegistrationBtn').onclick = startRegistration;
 
 let admitCardPage = 1;
 let admitCardClassFilter = '';
+let admitCardStatusFilter = '';
 
 async function loadAdmitCardStats() {
   try {
@@ -1558,7 +1620,15 @@ async function loadAdmitCards() {
       return;
     }
 
-    j.data.forEach(s => {
+    // Apply status filter if set
+    let filteredData = j.data;
+    if (admitCardStatusFilter === 'released') {
+      filteredData = j.data.filter(s => s.admitCardReleased);
+    } else if (admitCardStatusFilter === 'pending') {
+      filteredData = j.data.filter(s => !s.admitCardReleased);
+    }
+
+    filteredData.forEach(s => {
       const tr = document.createElement('tr');
       const statusClass = s.admitCardReleased ? 'released' : 'pending';
       const statusText = s.admitCardReleased ? 'Released' : 'Pending';
@@ -1790,9 +1860,153 @@ async function releaseAllAdmitCards() {
   }
 }
 
+async function releaseSchoolAdmitCards() {
+  const schoolId = qs('#schoolSelectForRelease').value;
+  if (!schoolId) {
+    alert('Please select a school');
+    return;
+  }
+
+  const schoolSelect = qs('#schoolSelectForRelease');
+  const schoolName = schoolSelect.options[schoolSelect.selectedIndex].text;
+
+  if (!confirm(`Release admit cards for all students in ${schoolName}? This action cannot be undone.`)) return;
+
+  const btn = qs('#releaseSchoolBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+  try {
+    const res = await fetch(`${API}/admin/admit-cards/release-school/${schoolId}`, {
+      method: 'POST',
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (j.success) {
+      alert(` Admit cards released for ${j.data.released} students from ${schoolName}!`);
+      loadAdmitCards();
+      loadAdmitCardStats();
+      qs('#schoolSelectForRelease').value = '';
+    } else {
+      alert('Failed to release admit cards: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('School release error:', e);
+    alert('Failed to release admit cards for school');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+  }
+}
+
+async function releaseIndividualAdmitCard() {
+  const searchTerm = qs('#studentSearchForRelease').value.trim();
+  if (!searchTerm) {
+    alert('Please enter a student name');
+    return;
+  }
+
+  const btn = qs('#releaseIndividualBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+  try {
+    // Find student by name
+    const res = await fetch(`${API}/admin/students`, {
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (!j.success || !j.data) {
+      alert('Failed to fetch student list');
+      return;
+    }
+
+    const students = j.data;
+    const matching = students.filter(s => 
+      s.name && s.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (matching.length === 0) {
+      alert(`No students found matching "${searchTerm}"`);
+    } else if (matching.length === 1) {
+      const student = matching[0];
+      if (student.admitCardReleased) {
+        alert(`Admit card for ${student.name} is already released`);
+      } else {
+        if (confirm(`Release admit card for ${student.name}? Class ${student.class}`)) {
+          const releaseRes = await fetch(`${API}/admin/admit-cards/release/${student._id}`, {
+            method: 'POST',
+            headers: headers()
+          });
+          const releaseJ = await releaseRes.json();
+          if (releaseJ.success) {
+            alert(` Admit card released for ${student.name}!\nRoll Number: ${releaseJ.data.rollNumber}`);
+            loadAdmitCards();
+            loadAdmitCardStats();
+            qs('#studentSearchForRelease').value = '';
+          } else {
+            alert('Failed to release admit card: ' + (releaseJ.message || 'Unknown error'));
+          }
+        }
+      }
+    } else {
+      const names = matching.map(s => `${s.name} (Class ${s.class})`).join('\n');
+      alert(`Found ${matching.length} students:\n${names}\n\nPlease be more specific.`);
+    }
+  } catch (e) {
+    console.error('Individual release error:', e);
+    alert('Failed to release admit card for individual student');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+  }
+}
+
+// Load schools for release dropdown
+async function loadSchoolsForRelease() {
+  try {
+    const res = await fetch(`${API}/admin/students`, {
+      headers: headers()
+    });
+    const j = await res.json();
+
+    if (!j.success || !j.data) return;
+
+    const schools = new Map();
+    j.data.forEach(student => {
+      if (student.school && student.school._id) {
+        const key = student.school._id;
+        if (!schools.has(key)) {
+          schools.set(key, student.school.schoolName || 'Unknown School');
+        }
+      }
+    });
+
+    const select = qs('#schoolSelectForRelease');
+    schools.forEach((name, id) => {
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+  } catch (e) {
+    console.error('Failed to load schools:', e);
+  }
+}
+
 // Event listeners for admit card management
 if (qs('#releaseAllBtn')) {
   qs('#releaseAllBtn').onclick = releaseAllAdmitCards;
+}
+
+if (qs('#releaseSchoolBtn')) {
+  qs('#releaseSchoolBtn').onclick = releaseSchoolAdmitCards;
+}
+
+if (qs('#releaseIndividualBtn')) {
+  qs('#releaseIndividualBtn').onclick = releaseIndividualAdmitCard;
 }
 
 if (qs('#refreshAdmitStatsBtn')) {
@@ -1807,6 +2021,16 @@ if (qs('#admitClassFilter')) {
   };
 }
 
+if (qs('#admitStatusFilter')) {
+  qs('#admitStatusFilter').onchange = () => {
+    admitCardStatusFilter = qs('#admitStatusFilter').value;
+    admitCardPage = 1;
+    loadAdmitCards();
+  };
+}
+
+// Load schools on page load
+loadSchoolsForRelease();
 // Export to CSV
 async function exportToCSV() {
   try {
