@@ -10,7 +10,7 @@
     .container{max-width:900px;width:100%}
     .card{background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(20,25,40,0.08);padding:22px}
     header{display:flex;align-items:center;gap:16px}
-    .logo{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .logo{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
     h1{font-size:18px;margin:0}
     p.lead{margin:6px 0 0;color:var(--muted)}
     .controls{margin-top:18px;display:flex;gap:10px}
@@ -34,15 +34,14 @@
   <div class="container">
     <div class="card">
       <header>
-        <div class="logo">BOM</div>
+        <div class="logo"><img src="logo.jpg" alt="Brain O Math Logo" style="width:100%;height:100%;object-fit:contain;border-radius:8px;"></div>
         <div>
           <h1>Invigilator — Student Verification</h1>
-          <p class="lead">Scan the QR code on the admit card to view the student's data. The QR contains all student information offline.</p>
         </div>
       </header>
 
       <div class="controls">
-        <p style="margin:0;color:var(--muted);font-size:14px">🔍 Scanning QR code...</p>
+        <h1>Student Infromation</h1>
       </div>
 
       <div class="result" id="result">
@@ -56,7 +55,9 @@
         </div>
       </div>
 
-      <footer>Only use this page for verifying student identity during examinations.</footer>
+        <footer>
+            &copy; 2025 Brain-O-Math. All rights reserved.  
+        </footer>
     </div>
   </div>
 
@@ -90,14 +91,13 @@
         <div class="row"><div class="label">Subjects</div><div class="value">${escapeHtml(d.subjects || '—')}</div></div>
         <div class="row"><div class="label">School</div><div class="value">${escapeHtml(d.schoolName || '—')}</div></div>
         <div class="row"><div class="label">Coordinator</div><div class="value">${escapeHtml(d.coordinatorName || '—')}</div></div>
-        <div style="margin-top:10px;font-size:13px;color:var(--muted)"><strong>Parent:</strong> ${escapeHtml(d.parentName||'—')} &middot; ${escapeHtml(d.parentContact||'—')}</div>
+        
       `;
 
       schoolbox.innerHTML = `
         <h3 style="margin-top:0;color:var(--accent)">${escapeHtml(d.schoolName || '—')}</h3>
         <div style="font-size:13px;color:var(--muted)">Coordinator: <strong>${escapeHtml(d.coordinatorName || '—')}</strong></div>
         <div style="margin-top:8px">Email: <a href="mailto:${escapeHtml(d.coordinatorEmail || '')}">${escapeHtml(d.coordinatorEmail || '—')}</a></div>
-        <div style="margin-top:8px">Phone: ${escapeHtml(d.coordinatorPhone || '—')}</div>
         <hr style="margin:12px 0;border:none;border-top:1px solid #f1f5f9">
         <div>Registration ID: <strong>${escapeHtml(d.registrationId || '—')}</strong></div>
       `;
