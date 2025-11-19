@@ -10,7 +10,7 @@
     .container{max-width:900px;width:100%}
     .card{background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(20,25,40,0.08);padding:22px}
     header{display:flex;align-items:center;gap:16px}
-    .logo{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .logo{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;overflow:hidden}
     h1{font-size:18px;margin:0}
     p.lead{margin:6px 0 0;color:var(--muted)}
     .controls{margin-top:18px;display:flex;gap:10px}
@@ -88,7 +88,7 @@
         <div class="row"><div class="label">Roll Number</div><div class="value">${escapeHtml(d.rollNumber || '—')}</div></div>
         <div class="row"><div class="label">Class</div><div class="value">${escapeHtml(d.class || '—')}</div></div>
         <div class="row"><div class="label">Category</div><div class="value">${escapeHtml(d.category || '—')}</div></div>
-        <div class="row"><div class="label">Subjects</div><div class="value">${escapeHtml(d.subjects || '—')}</div></div>
+        <div class="row"><div class="label">Subject choice</div><div class="value">${escapeHtml(d.subjects || '—')}</div></div>
         <div class="row"><div class="label">School</div><div class="value">${escapeHtml(d.schoolName || '—')}</div></div>
         <div class="row"><div class="label">Coordinator</div><div class="value">${escapeHtml(d.coordinatorName || '—')}</div></div>
         
@@ -97,7 +97,7 @@
       schoolbox.innerHTML = `
         <h3 style="margin-top:0;color:var(--accent)">${escapeHtml(d.schoolName || '—')}</h3>
         <div style="font-size:13px;color:var(--muted)">Coordinator: <strong>${escapeHtml(d.coordinatorName || '—')}</strong></div>
-        <div style="margin-top:8px">Email: <a href="mailto:${escapeHtml(d.coordinatorEmail || '')}">${escapeHtml(d.coordinatorEmail || '—')}</a></div>
+        <div style="margin-top:8px">Coordinator Email: <a href="mailto:${escapeHtml(d.coordinatorEmail || '')}">${escapeHtml(d.coordinatorEmail || '—')}</a></div>
         <hr style="margin:12px 0;border:none;border-top:1px solid #f1f5f9">
         <div>Registration ID: <strong>${escapeHtml(d.registrationId || '—')}</strong></div>
       `;
