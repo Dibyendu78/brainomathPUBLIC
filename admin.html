@@ -2036,17 +2036,27 @@ loadSchoolsForRelease();
 // Export to CSV
 async function exportToCSV() {
   try {
-    const res = await fetch(`${API}/admin/students?page=1&limit=10000`, { headers: headers() });
-    const j = await res.json();
-    const students = j.data || [];
+    // First, fetch the total count to know how many pages we need
+    const firstRes = await fetch(`${API}/admin/students?page=1`, { headers: headers() });
+    const firstData = await firstRes.json();
+    const totalPages = firstData.pagination?.pages || 1;
     
-    if (students.length === 0) {
+    let allStudents = [];
+    
+    // Fetch all pages
+    for (let page = 1; page <= totalPages; page++) {
+      const res = await fetch(`${API}/admin/students?page=${page}`, { headers: headers() });
+      const data = await res.json();
+      allStudents = allStudents.concat(data.data || []);
+    }
+    
+    if (allStudents.length === 0) {
       alert('No students to export');
       return;
     }
     
     let csv = 'Student ID,Name,Class,Roll Number,School,Status,Released Date\n';
-    students.forEach(s => {
+    allStudents.forEach(s => {
       const status = s.admitCardReleased ? 'Released' : 'Pending';
       const date = s.admitCardReleasedAt ? new Date(s.admitCardReleasedAt).toLocaleDateString('en-IN') : 'N/A';
       csv += `"${s.studentId || s._id.substring(0, 8)}","${s.name}","${s.class}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
@@ -2060,7 +2070,7 @@ async function exportToCSV() {
     a.click();
     window.URL.revokeObjectURL(url);
     
-    alert(` Exported ${students.length} students to CSV`);
+    alert(` Exported ${allStudents.length} students to CSV`);
   } catch (e) {
     console.error('CSV export error:', e);
     alert('Failed to export CSV');
