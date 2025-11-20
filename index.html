@@ -1139,12 +1139,7 @@
         </div>
     </div>
 
-    <!-- Prominent site-wide announcement (dismissible for the session) -->
-    <div class="site-alert" id="siteAlert" role="status" aria-live="polite">
-        Registration deadline extended to <strong>18 November 2025</strong>. Admit card will be released on <strong>20 November 2025</strong> — please plan accordingly.
-        <small>Click the × button to dismiss this message for your session.</small>
-        <button class="close-btn" id="alertCloseBtn" aria-label="Dismiss announcement">×</button>
-    </div>
+    
 
     <header>
         <nav class="container">
@@ -1762,8 +1757,8 @@
         console.log('Brain-O-Math Olympiad 2025 - Website Loaded Successfully! 🎯');
 
         // Check registration status and handle Register Now links
-        const API = 'https://brain-o-math.onrender.com/api';
-        //const API = location.origin.includes('localhost') ? 'https://brain-o-math-olympiad.onrender.com/api' : '/api';
+        //const API = 'https://brain-o-math.onrender.com/api';
+        const API = location.origin.includes('localhost') ? 'https://brain-o-math-olympiad.onrender.com/api' : '/api';
 
         async function checkRegistrationStatus() {
             try {
