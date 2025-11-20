@@ -898,6 +898,7 @@ select:focus {
                 <th><i class="fas fa-hashtag"></i> ID</th>
                 <th><i class="fas fa-user"></i> Name</th>
                 <th><i class="fas fa-graduation-cap"></i> Class</th>
+                <th><i class="fas fa-layer-group"></i> Category</th>
                 <th><i class="fas fa-id-card"></i> Roll Number</th>
                 <th><i class="fas fa-book"></i> Subjects</th>
                 <th><i class="fas fa-credit-card"></i> Payment</th>
@@ -1580,6 +1581,17 @@ let admitCardPage = 1;
 let admitCardClassFilter = '';
 let admitCardStatusFilter = '';
 
+// Helper function to get category from class
+function getCategoryFromClass(cls) {
+  const classNum = parseInt(cls, 10);
+  if (classNum >= 3 && classNum <= 4) return 'A';
+  if (classNum >= 5 && classNum <= 6) return 'B';
+  if (classNum >= 7 && classNum <= 8) return 'C';
+  if (classNum >= 9 && classNum <= 10) return 'D';
+  if (classNum >= 11 && classNum <= 12) return 'E';
+  return 'N/A';
+}
+
 async function loadAdmitCardStats() {
   try {
     const res = await fetch(API + '/admin/admit-cards/stats', { headers: headers() });
@@ -1599,7 +1611,7 @@ async function loadAdmitCardStats() {
 
 async function loadAdmitCards() {
   const tbody = qs('#admitCardTable tbody');
-  tbody.innerHTML = '<tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="10" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
 
   try {
     let url = `${API}/admin/students?page=${admitCardPage}`;
@@ -1613,7 +1625,7 @@ async function loadAdmitCards() {
     if (!j.data || j.data.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" class="empty-state">
+          <td colspan="10" class="empty-state">
             <i class="fas fa-inbox"></i>
             <p>No students found</p>
           </td>
@@ -1635,6 +1647,9 @@ async function loadAdmitCards() {
       const statusClass = s.admitCardReleased ? 'released' : 'pending';
       const statusText = s.admitCardReleased ? 'Released' : 'Pending';
       
+      // Get category from class
+      const category = getCategoryFromClass(s.class);
+      
       // Format subjects for display
       let subjectsText = 'N/A';
       if (s.subjects) {
@@ -1653,6 +1668,7 @@ async function loadAdmitCards() {
         <td><strong>${s.studentId || s._id.substring(0, 8)}</strong></td>
         <td>${s.name}</td>
         <td>Class ${s.class}</td>
+        <td><strong style="font-size: 1.1rem; color: #667eea;">Category ${category}</strong></td>
         <td><span style="font-family: monospace; font-weight: bold; color: #3b82f6;">${s.rollNumber || 'Not Assigned'}</span></td>
         <td><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">${subjectsText}</span></td>
         <td><span class="status-badge ${paymentBadgeClass}">${paymentDisplayText}</span></td>
