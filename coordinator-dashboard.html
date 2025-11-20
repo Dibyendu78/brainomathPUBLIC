@@ -1429,6 +1429,7 @@
                                     <th>Category</th>
                                     <th>Subjects</th>
                                     <th>Fee</th>
+                                    <th>Coordinator Name</th>
                                     <th>Roll Number</th>
                                     <th>Admit Status</th>
                                     <th>Actions</th>
@@ -1620,6 +1621,7 @@
         // ===============================
         let coordinatorToken = localStorage.getItem('coordinatorToken');
         let registrationData = null;
+        let coordinatorNameFromAPI = '';
         let currentEditingStudent = null;
         let currentEditingStudentId = null;  // For editing by ID after payment
         let isPaymentSubmitted = false;
@@ -1835,6 +1837,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     registrationData = data.data || { students: [], totalAmount: 0 };
+                    coordinatorNameFromAPI = data.coordinatorName || coordinatorData.coordinatorName || 'N/A';
 
                     isPaymentSubmitted = registrationData.paymentStatus === 'completed' ||
                         registrationData.paymentStatus === 'verified' ||
@@ -1909,6 +1912,7 @@
                     <td>Category ${student.category || '-'}</td>
                     <td>${formatSubjects(student.subjects || '-')}</td>
                     <td>₹${student.fee || 0}</td>
+                    <td>${coordinatorNameFromAPI || '-'}</td>
                     <td><span class="roll-number">${student.rollNumber || 'Not Assigned'}</span></td>
                     <td>
                         <span class="admit-status ${student.admitCardReleased ? 'released' : 'pending'}">

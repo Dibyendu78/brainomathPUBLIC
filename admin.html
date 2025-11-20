@@ -681,6 +681,7 @@ select:focus {
               <tr>
                 <th><i class="fas fa-hashtag"></i> ID</th>
                 <th><i class="fas fa-school"></i> School</th>
+                <th><i class="fas fa-user"></i> Coordinator Name</th>
                 <th><i class="fas fa-users"></i> Students</th>
                 <th><i class="fas fa-rupee-sign"></i> Amount</th>
                 <th><i class="fas fa-receipt"></i> UTR Number</th>
@@ -970,7 +971,7 @@ let page = 1, status = '';
 
 async function loadRegs() {
   const tbody = qs('#regTable tbody');
-  tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
 
   try {
     let url = `${API}/admin/registrations?page=${page}`;
@@ -984,7 +985,7 @@ async function loadRegs() {
     if (!j.data || j.data.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="empty-state">
+          <td colspan="8" class="empty-state">
             <i class="fas fa-inbox"></i>
             <p>No registrations found</p>
           </td>
@@ -998,6 +999,7 @@ async function loadRegs() {
       tr.innerHTML = `
         <td><strong>${r.registrationId}</strong></td>
         <td>${r.school?.schoolName || 'N/A'}</td>
+        <td>${r.school?.coordinatorName || 'N/A'}</td>
         <td><span style="font-weight: 600;">${r.students?.length || 0}</span></td>
         <td><strong>₹${r.totalAmount}</strong></td>
         <td><span class="utr-number">${r.utr || 'N/A'}</span></td>
@@ -1028,7 +1030,7 @@ async function loadRegs() {
     console.error('Load registrations error:', e);
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="empty-state">
+        <td colspan="8" class="empty-state">
           <i class="fas fa-exclamation-triangle"></i>
           <p>Error loading registrations</p>
         </td>
