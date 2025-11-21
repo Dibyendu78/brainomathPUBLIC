@@ -2071,14 +2071,22 @@ async function exportToCSV() {
       return;
     }
 
-    // CSV header now includes Category
-    let csv = 'Student ID,Name,Class,Category,Roll Number,School,Status,Released Date\n';
+    // CSV header now includes Category and Subjects
+    let csv = 'Student ID,Name,Class,Category,Subjects,Roll Number,School,Status,Released Date\n';
     allStudents.forEach(s => {
       const status = s.admitCardReleased ? 'Released' : 'Pending';
       const date = s.admitCardReleasedAt ? new Date(s.admitCardReleasedAt).toLocaleDateString('en-IN') : 'N/A';
       // Use helper to determine category from class if available
       const category = (typeof getCategoryFromClass === 'function') ? getCategoryFromClass(s.class) : (s.category || 'N/A');
-      csv += `"${s.studentId || (s._id || '').toString().substring(0, 8)}","${s.name || ''}","${s.class || ''}","${category}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
+      // Map subjects to readable labels (same as table)
+      let subjectsText = 'N/A';
+      if (s.subjects) {
+        if (s.subjects === 'both') subjectsText = 'Math & Science';
+        else if (s.subjects === 'math') subjectsText = 'Mathematics';
+        else if (s.subjects === 'science') subjectsText = 'Science';
+        else subjectsText = s.subjects;
+      }
+      csv += `"${s.studentId || (s._id || '').toString().substring(0, 8)}","${s.name || ''}","${s.class || ''}","${category}","${subjectsText}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
     });
     
     const blob = new Blob([csv], { type: 'text/csv' });
