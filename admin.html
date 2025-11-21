@@ -2070,12 +2070,15 @@ async function exportToCSV() {
       alert('No students to export');
       return;
     }
-    
-    let csv = 'Student ID,Name,Class,Roll Number,School,Status,Released Date\n';
+
+    // CSV header now includes Category
+    let csv = 'Student ID,Name,Class,Category,Roll Number,School,Status,Released Date\n';
     allStudents.forEach(s => {
       const status = s.admitCardReleased ? 'Released' : 'Pending';
       const date = s.admitCardReleasedAt ? new Date(s.admitCardReleasedAt).toLocaleDateString('en-IN') : 'N/A';
-      csv += `"${s.studentId || s._id.substring(0, 8)}","${s.name}","${s.class}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
+      // Use helper to determine category from class if available
+      const category = (typeof getCategoryFromClass === 'function') ? getCategoryFromClass(s.class) : (s.category || 'N/A');
+      csv += `"${s.studentId || (s._id || '').toString().substring(0, 8)}","${s.name || ''}","${s.class || ''}","${category}","${s.rollNumber || 'N/A'}","${s.school?.schoolName || 'N/A'}","${status}","${date}"\n`;
     });
     
     const blob = new Blob([csv], { type: 'text/csv' });
