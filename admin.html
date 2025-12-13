@@ -2449,12 +2449,12 @@ async function loadResultsForEntry() {
         <td>${s.coordinatorName || 'N/A'}</td>
         <td>
           ${s.subjects === 'math' || s.subjects === 'both' ? 
-            `<input type="number" id="mathMarks_${s._id}" class="marks-input" min="0" max="100" value="${mathMarks}" placeholder="0-100" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
+            `<input type="number" id="mathMarks_${s._id}" class="marks-input" min="0" max="60" value="${mathMarks}" placeholder="0-60" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
             : `<span style="color: #999;">N/A</span>`}
         </td>
         <td>
           ${s.subjects === 'science' || s.subjects === 'both' ? 
-            `<input type="number" id="scienceMarks_${s._id}" class="marks-input" min="0" max="100" value="${scienceMarks}" placeholder="0-100" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
+            `<input type="number" id="scienceMarks_${s._id}" class="marks-input" min="0" max="60" value="${scienceMarks}" placeholder="0-60" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
             : `<span style="color: #999;">N/A</span>`}
         </td>
         <td>
