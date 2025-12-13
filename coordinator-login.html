@@ -844,7 +844,7 @@
           localStorage.setItem('coordinatorData', JSON.stringify(data.coordinator));
 
           // Success feedback
-          showAlert('Login successful! Redirecting to dashboard...', 'success');
+          showAlert('Login successful! Redirecting to results...', 'success');
           loginBtn.innerHTML = `
             <i class="fas fa-check-circle"></i>
             Success!
@@ -853,7 +853,8 @@
 
           // Redirect after delay
           setTimeout(() => {
-            window.location.href = '/coordinator-dashboard.html';
+            //window.location.href = '/corrdinator-dasboard.html';
+            window.location.href = '/result-view.html';
           }, 1500);
 
         } else {
@@ -1013,7 +1014,7 @@
     if (localStorage.getItem('coordinatorToken')) {
       showAlert('Already logged in. Redirecting...', 'success');
       setTimeout(() => {
-        window.location.href = '/coordinator-dashboard.html';
+        window.location.href = '/result-view.html';
       }, 1500);
     }
 
