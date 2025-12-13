@@ -616,6 +616,28 @@ select:focus {
       </div>
     </div>
 
+    <!-- Messaging Section -->
+    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white;">
+      <h2 style="color: white; margin-bottom: 1rem;">
+        <i class="fas fa-envelope"></i> Send Message to All Coordinators
+      </h2>
+      <div style="display: flex; gap: 1.5rem; flex-direction: column;">
+        <div>
+          <label for="messageContent" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Message Content:</label>
+          <textarea id="messageContent" 
+            placeholder="Write your message here... This will be sent to all coordinators via email." 
+            style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif; resize: vertical; color: #333; background: white;">
+          </textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <button id="sendMessageBtn" class="btn" style="background: #10b981; color: white; padding: 0.8rem 2rem; font-size: 1rem;">
+            <i class="fas fa-paper-plane"></i> Send Message to All
+          </button>
+          <div id="messageStatus" style="display: none; padding: 0.8rem 1.5rem; background: rgba(255,255,255,0.2); border-radius: 6px; font-weight: 500;"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Registration Control Section -->
     <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
       <h2 style="color: white; margin-bottom: 1rem;">
@@ -645,6 +667,15 @@ select:focus {
       </button>
       <button class="tab-btn" data-tab="students">
         <i class="fas fa-user-graduate"></i> Student Management
+      </button>
+      <button class="tab-btn" data-tab="results">
+        <i class="fas fa-file-alt"></i> Enter Result Details
+      </button>
+      <button class="tab-btn" data-tab="edit-students">
+        <i class="fas fa-edit"></i> Edit Student Details
+      </button>
+      <button class="tab-btn" data-tab="report-cards">
+        <i class="fas fa-certificate"></i> Report Cards & Certificates
       </button>
       <button class="tab-btn" data-tab="admit-cards">
         <i class="fas fa-id-card"></i> Admit Card Management
@@ -760,6 +791,225 @@ select:focus {
         </div>
         
         <div class="pagination" id="studentPager"></div>
+      </div>
+    </div>
+
+    <!-- Enter Result Details Tab -->
+    <div id="results" class="tab-content">
+      <div class="card">
+        <h2><i class="fas fa-file-alt"></i> Enter Result Details</h2>
+        
+        <div class="stats-grid" id="resultStatsContainer">
+          <div class="stat-box">
+            <div class="stat-value" id="totalResultStudents">0</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="marksEnteredCount">0</div>
+            <div class="stat-label">Marks Entered</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="marksPendingCount">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="marksPercentage">0%</div>
+            <div class="stat-label">Progress</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="filter-group">
+            <label for="resultClassFilter">
+              <i class="fas fa-graduation-cap"></i> Filter by Class:
+            </label>
+            <select id="resultClassFilter">
+              <option value="">All Classes</option>
+              <option value="3">Class 3</option>
+              <option value="4">Class 4</option>
+              <option value="5">Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="resultSubjectFilter">
+              <i class="fas fa-book"></i> Filter by Subject:
+            </label>
+            <select id="resultSubjectFilter">
+              <option value="">All Subjects</option>
+              <option value="math">Math</option>
+              <option value="science">Science</option>
+              <option value="all">Both</option>
+            </select>
+          </div>
+
+          <button id="refreshResultStatsBtn" class="btn" style="background: #3b82f6; color: white;">
+            <i class="fas fa-sync"></i> Refresh Stats
+          </button>
+
+          <button id="saveAllMarksBtn" class="btn" style="background: #10b981; color: white;">
+            <i class="fas fa-save"></i> Save All on This Page
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table id="resultTable">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> Roll Number</th>
+                <th><i class="fas fa-user"></i> Student Name</th>
+                <th><i class="fas fa-graduation-cap"></i> Class</th>
+                <th><i class="fas fa-book"></i> Subjects</th>
+                <th><i class="fas fa-school"></i> School</th>
+                <th><i class="fas fa-user-tie"></i> Coordinator</th>
+                <th><i class="fas fa-calculator"></i> Math Marks</th>
+                <th><i class="fas fa-flask"></i> Science Marks</th>
+                <th><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="pagination" id="resultPager"></div>
+      </div>
+    </div>
+
+    <!-- Edit Student Details Tab -->
+    <div id="edit-students" class="tab-content">
+      <div class="card">
+        <h2><i class="fas fa-edit"></i> Edit Student Details</h2>
+        
+        <div class="stats-grid" id="editStudentStatsContainer">
+          <div class="stat-box">
+            <div class="stat-value" id="totalEditStudents">0</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="editedCount">0</div>
+            <div class="stat-label">Modified</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="pendingEditCount">0</div>
+            <div class="stat-label">Pending Save</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="filter-group">
+            <label for="editStudentClassFilter">
+              <i class="fas fa-graduation-cap"></i> Filter by Class:
+            </label>
+            <select id="editStudentClassFilter">
+              <option value="">All Classes</option>
+              <option value="3">Class 3</option>
+              <option value="4">Class 4</option>
+              <option value="5">Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="editStudentSubjectFilter">
+              <i class="fas fa-book"></i> Filter by Subject:
+            </label>
+            <select id="editStudentSubjectFilter">
+              <option value="">All Subjects</option>
+              <option value="math">Math</option>
+              <option value="science">Science</option>
+              <option value="all">Both</option>
+            </select>
+          </div>
+
+          <button id="refreshEditStatsBtn" class="btn" style="background: #3b82f6; color: white;">
+            <i class="fas fa-sync"></i> Refresh Stats
+          </button>
+
+          <button id="saveAllEditBtn" class="btn" style="background: #10b981; color: white;">
+            <i class="fas fa-save"></i> Save All Changes on This Page
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table id="editStudentTable">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> Roll Number</th>
+                <th><i class="fas fa-user"></i> Student Name</th>
+                <th><i class="fas fa-graduation-cap"></i> Class</th>
+                <th><i class="fas fa-book"></i> Subjects</th>
+                <th><i class="fas fa-school"></i> School</th>
+                <th><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="pagination" id="editStudentPager"></div>
+      </div>
+    </div>
+
+    <!-- Report Cards & Certificates Tab -->
+    <div id="report-cards" class="tab-content">
+      <div class="card">
+        <h2><i class="fas fa-certificate"></i> Report Cards & Certificates Management</h2>
+        
+        <!-- Release/Stop Options -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 40px; margin-bottom: 20px; color: white;">
+          <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; text-align: center; justify-content: center;">
+            <i class="fas fa-paper-plane"></i> Release & Control Results
+          </h3>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 600px; margin: 40px auto;">
+            <!-- Release Button -->
+            <div style="border: 2px solid rgba(255,255,255,0.5); border-radius: 8px; padding: 30px; background: rgba(0,0,0,0.1); text-align: center;">
+              <h4 style="margin: 0 0 15px 0; font-size: 1.1rem;">
+                <i class="fas fa-unlock"></i> Release
+              </h4>
+              <p style="margin: 0 0 20px 0; font-size: 0.9rem; opacity: 0.95;">
+                Release both Report Cards & Certificates to all students
+              </p>
+              <button id="releaseAllBtn" class="btn" style="background: #10b981; color: white; width: 100%; cursor: pointer; border: none; padding: 12px; border-radius: 4px; font-size: 1rem; font-weight: 600;">
+                <i class="fas fa-unlock"></i> Release
+              </button>
+            </div>
+
+            <!-- Stop Button -->
+            <div style="border: 2px solid rgba(255,255,255,0.5); border-radius: 8px; padding: 30px; background: rgba(0,0,0,0.1); text-align: center;">
+              <h4 style="margin: 0 0 15px 0; font-size: 1.1rem;">
+                <i class="fas fa-lock"></i> Stop
+              </h4>
+              <p style="margin: 0 0 20px 0; font-size: 0.9rem; opacity: 0.95;">
+                Stop both Report Cards & Certificates access from students
+              </p>
+              <button id="stopAllBtn" class="btn" style="background: #ef4444; color: white; width: 100%; cursor: pointer; border: none; padding: 12px; border-radius: 4px; font-size: 1rem; font-weight: 600;">
+                <i class="fas fa-lock"></i> Stop
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Message -->
+        <div id="reportStatusMessage" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+        </div>
+
+        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 20px;">
+          <i class="fas fa-info-circle"></i> When released, students can view results in their dashboard. When stopped, results are hidden from all students.
+        </p>
       </div>
     </div>
 
@@ -943,6 +1193,14 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       loadRegs();
     } else if (tabName === 'students') {
       loadStudents();
+    } else if (tabName === 'results') {
+      loadResultEntryStats();
+      loadResultsForEntry();
+    } else if (tabName === 'edit-students') {
+      loadEditStudentStats();
+      loadStudentsForEditing();
+    } else if (tabName === 'report-cards') {
+      // Report cards tab loaded
     } else if (tabName === 'admit-cards') {
       loadAdmitCardStats();
       loadAdmitCards();
@@ -2117,12 +2375,857 @@ if (qs('#exportExcelBtn')) {
   qs('#exportExcelBtn').onclick = exportToExcel;
 }
 
+// ===============================
+// RESULT ENTRY MANAGEMENT
+// ===============================
+
+let resultPage = 1;
+let resultClassFilter = '';
+let resultSubjectFilter = '';
+
+async function loadResultEntryStats() {
+  try {
+    const res = await fetch(API + '/admin/results/stats', { headers: headers() });
+    const j = await res.json();
+    
+    if (j.success) {
+      const stats = j.data.summary;
+      qs('#totalResultStudents').textContent = stats.totalStudents;
+      qs('#marksEnteredCount').textContent = stats.withMarks;
+      qs('#marksPendingCount').textContent = stats.pending;
+      qs('#marksPercentage').textContent = stats.percentage + '%';
+    }
+  } catch (e) {
+    console.error('Failed to load result entry stats:', e);
+  }
+}
+
+async function loadResultsForEntry() {
+  const tbody = qs('#resultTable tbody');
+  tbody.innerHTML = '<tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+  try {
+    let url = `${API}/admin/results/students?page=${resultPage}`;
+    if (resultClassFilter) url += `&class=${resultClassFilter}`;
+    if (resultSubjectFilter) url += `&subject=${resultSubjectFilter}`;
+    
+    const res = await fetch(url, { headers: headers() });
+    const j = await res.json();
+
+    tbody.innerHTML = '';
+
+    if (!j.data || j.data.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No students found</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    j.data.forEach(s => {
+      const tr = document.createElement('tr');
+      
+      let subjectsText = 'N/A';
+      if (s.subjects) {
+        if (s.subjects === 'both') subjectsText = 'Math & Science';
+        else if (s.subjects === 'math') subjectsText = 'Mathematics';
+        else if (s.subjects === 'science') subjectsText = 'Science';
+        else subjectsText = s.subjects;
+      }
+
+      const mathMarks = s.marks?.math !== undefined && s.marks?.math !== null ? s.marks.math : '';
+      const scienceMarks = s.marks?.science !== undefined && s.marks?.science !== null ? s.marks.science : '';
+      
+      tr.innerHTML = `
+        <td><span style="font-family: monospace; font-weight: bold; color: #3b82f6;">${s.rollNumber || 'N/A'}</span></td>
+        <td><strong>${s.name}</strong></td>
+        <td>Class ${s.class}</td>
+        <td><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">${subjectsText}</span></td>
+        <td>${s.schoolName || 'N/A'}</td>
+        <td>${s.coordinatorName || 'N/A'}</td>
+        <td>
+          ${s.subjects === 'math' || s.subjects === 'both' ? 
+            `<input type="number" id="mathMarks_${s._id}" class="marks-input" min="0" max="100" value="${mathMarks}" placeholder="0-100" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
+            : `<span style="color: #999;">N/A</span>`}
+        </td>
+        <td>
+          ${s.subjects === 'science' || s.subjects === 'both' ? 
+            `<input type="number" id="scienceMarks_${s._id}" class="marks-input" min="0" max="100" value="${scienceMarks}" placeholder="0-100" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">` 
+            : `<span style="color: #999;">N/A</span>`}
+        </td>
+        <td>
+          <button class="btn" onclick="saveStudentMarks('${s._id}')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Pagination
+    const totalPages = j.pagination?.pages || j.totalPages || 1;
+    const pager = qs('#resultPager');
+    pager.innerHTML = '';
+    
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, resultPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    const prevBtn = document.createElement('button');
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+    prevBtn.disabled = resultPage === 1;
+    prevBtn.onclick = () => {
+      if (resultPage > 1) {
+        resultPage--;
+        loadResultsForEntry();
+      }
+    };
+    pager.appendChild(prevBtn);
+    
+    if (startPage > 1) {
+      const btn1 = document.createElement('button');
+      btn1.textContent = '1';
+      btn1.onclick = () => {
+        resultPage = 1;
+        loadResultsForEntry();
+      };
+      pager.appendChild(btn1);
+      
+      if (startPage > 2) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = i === resultPage ? 'active' : '';
+      btn.onclick = () => {
+        resultPage = i;
+        loadResultsForEntry();
+      };
+      pager.appendChild(btn);
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+      
+      const btnLast = document.createElement('button');
+      btnLast.textContent = totalPages;
+      btnLast.onclick = () => {
+        resultPage = totalPages;
+        loadResultsForEntry();
+      };
+      pager.appendChild(btnLast);
+    }
+    
+    const nextBtn = document.createElement('button');
+    nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = resultPage === totalPages;
+    nextBtn.onclick = () => {
+      if (resultPage < totalPages) {
+        resultPage++;
+        loadResultsForEntry();
+      }
+    };
+    pager.appendChild(nextBtn);
+    
+    const pageInfo = document.createElement('div');
+    pageInfo.style.width = '100%';
+    pageInfo.style.textAlign = 'center';
+    pageInfo.style.marginTop = '10px';
+    pageInfo.style.fontSize = '0.9rem';
+    pageInfo.style.color = '#666';
+    pageInfo.innerHTML = `Page <strong>${resultPage}</strong> of <strong>${totalPages}</strong> | Total Students: <strong>${j.pagination?.total || j.count}</strong>`;
+    pager.appendChild(pageInfo);
+  } catch (e) {
+    console.error('Load results error:', e);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Failed to load students</p>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+async function saveStudentMarks(studentId) {
+  try {
+    const mathInput = qs(`#mathMarks_${studentId}`);
+    const scienceInput = qs(`#scienceMarks_${studentId}`);
+
+    const mathMarks = mathInput ? (mathInput.value === '' ? null : parseInt(mathInput.value)) : undefined;
+    const scienceMarks = scienceInput ? (scienceInput.value === '' ? null : parseInt(scienceInput.value)) : undefined;
+
+    // Validate marks
+    if (mathMarks !== undefined && mathMarks !== null) {
+      if (mathMarks < 0 || mathMarks > 100) {
+        alert('Math marks must be between 0 and 100');
+        return;
+      }
+    }
+
+    if (scienceMarks !== undefined && scienceMarks !== null) {
+      if (scienceMarks < 0 || scienceMarks > 100) {
+        alert('Science marks must be between 0 and 100');
+        return;
+      }
+    }
+
+    const res = await fetch(`${API}/admin/results/marks/${studentId}`, {
+      method: 'PUT',
+      headers: headers(),
+      body: JSON.stringify({
+        mathMarks: mathMarks,
+        scienceMarks: scienceMarks
+      })
+    });
+
+    const j = await res.json();
+    if (j.success) {
+      alert('Marks saved successfully!');
+      loadResultsForEntry();
+      loadResultEntryStats();
+    } else {
+      alert('Failed to save marks: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('Save marks error:', e);
+    alert('Failed to save marks');
+  }
+}
+
+async function saveAllMarksOnCurrentPage() {
+  try {
+    // Collect all student data from the current page
+    const tbody = qs('#resultTable tbody');
+    const rows = tbody.querySelectorAll('tr');
+    
+    if (rows.length === 0) {
+      alert('No students on this page to save');
+      return;
+    }
+
+    const students = [];
+    let hasAnyMarks = false;
+
+    rows.forEach(row => {
+      // Find all input fields in this row
+      const mathInput = row.querySelector('input[id*="mathMarks_"]');
+      const scienceInput = row.querySelector('input[id*="scienceMarks_"]');
+
+      if (mathInput || scienceInput) {
+        // Extract student ID from input ID (format: mathMarks_[studentId] or scienceMarks_[studentId])
+        let studentId = null;
+        if (mathInput) {
+          studentId = mathInput.id.replace('mathMarks_', '');
+        } else if (scienceInput) {
+          studentId = scienceInput.id.replace('scienceMarks_', '');
+        }
+
+        if (studentId) {
+          const mathMarks = mathInput ? (mathInput.value === '' ? null : parseInt(mathInput.value)) : undefined;
+          const scienceMarks = scienceInput ? (scienceInput.value === '' ? null : parseInt(scienceInput.value)) : undefined;
+
+          // Only add if at least one mark was entered
+          if (mathMarks !== undefined || scienceMarks !== undefined) {
+            hasAnyMarks = true;
+            students.push({
+              studentId,
+              mathMarks,
+              scienceMarks
+            });
+          }
+        }
+      }
+    });
+
+    if (!hasAnyMarks) {
+      alert('No marks entered on this page to save');
+      return;
+    }
+
+    // Validate all marks before sending
+    for (const student of students) {
+      if (student.mathMarks !== null && student.mathMarks !== undefined) {
+        if (student.mathMarks < 0 || student.mathMarks > 100) {
+          alert(`Math marks for one student must be between 0 and 100`);
+          return;
+        }
+      }
+      if (student.scienceMarks !== null && student.scienceMarks !== undefined) {
+        if (student.scienceMarks < 0 || student.scienceMarks > 100) {
+          alert(`Science marks for one student must be between 0 and 100`);
+          return;
+        }
+      }
+    }
+
+    const btn = qs('#saveAllMarksBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving all marks...';
+
+    const res = await fetch(`${API}/admin/results/marks/batch`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ students })
+    });
+
+    const j = await res.json();
+    if (j.success) {
+      alert(`✓ Success! Saved ${j.data.successCount} out of ${j.data.total} students on this page.${j.data.failureCount > 0 ? '\n' + j.data.failureCount + ' failed.' : ''}`);
+      loadResultsForEntry();
+      loadResultEntryStats();
+    } else {
+      alert('Failed to save marks: ' + (j.message || 'Unknown error'));
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  } catch (e) {
+    console.error('Save all marks error:', e);
+    alert('Failed to save marks');
+    const btn = qs('#saveAllMarksBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Save All on This Page';
+  }
+}
+
+// Event listeners for result entry
+if (qs('#resultClassFilter')) {
+  qs('#resultClassFilter').onchange = () => {
+    resultClassFilter = qs('#resultClassFilter').value;
+    resultPage = 1;
+    loadResultsForEntry();
+  };
+}
+
+if (qs('#resultSubjectFilter')) {
+  qs('#resultSubjectFilter').onchange = () => {
+    resultSubjectFilter = qs('#resultSubjectFilter').value;
+    resultPage = 1;
+    loadResultsForEntry();
+  };
+}
+
+if (qs('#refreshResultStatsBtn')) {
+  qs('#refreshResultStatsBtn').onclick = loadResultEntryStats;
+}
+
+if (qs('#saveAllMarksBtn')) {
+  qs('#saveAllMarksBtn').onclick = saveAllMarksOnCurrentPage;
+}
+
+// ===============================
+// EDIT STUDENT DETAILS MANAGEMENT
+// ===============================
+
+let editStudentPage = 1;
+let editStudentClassFilter = '';
+let editStudentSubjectFilter = '';
+
+async function loadEditStudentStats() {
+  try {
+    const res = await fetch(API + '/admin/edit/students?page=1&class=&subject=', { headers: headers() });
+    const j = await res.json();
+    
+    if (j.success) {
+      qs('#totalEditStudents').textContent = j.pagination?.total || 0;
+      qs('#editedCount').textContent = '0';
+      qs('#pendingEditCount').textContent = '0';
+    }
+  } catch (e) {
+    console.error('Failed to load edit student stats:', e);
+  }
+}
+
+async function loadStudentsForEditing() {
+  const tbody = qs('#editStudentTable tbody');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+  try {
+    let url = `${API}/admin/edit/students?page=${editStudentPage}`;
+    if (editStudentClassFilter) url += `&class=${editStudentClassFilter}`;
+    if (editStudentSubjectFilter) url += `&subject=${editStudentSubjectFilter}`;
+    
+    const res = await fetch(url, { headers: headers() });
+    const j = await res.json();
+
+    tbody.innerHTML = '';
+
+    if (!j.data || j.data.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No students found</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    j.data.forEach(s => {
+      const tr = document.createElement('tr');
+      
+      let subjectsText = 'N/A';
+      if (s.subjects) {
+        if (s.subjects === 'both') subjectsText = 'Math & Science';
+        else if (s.subjects === 'math') subjectsText = 'Mathematics';
+        else if (s.subjects === 'science') subjectsText = 'Science';
+        else subjectsText = s.subjects;
+      }
+
+      tr.innerHTML = `
+        <td><span style="font-family: monospace; font-weight: bold; color: #3b82f6;">${s.rollNumber || 'N/A'}</span></td>
+        <td>
+          <input type="text" id="name_${s._id}" class="student-name-input" value="${s.name}" 
+            style="width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-weight: 500;">
+        </td>
+        <td>Class ${s.class}</td>
+        <td><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">${subjectsText}</span></td>
+        <td>${s.schoolName || 'N/A'}</td>
+        <td>
+          <button class="btn" onclick="saveStudentName('${s._id}')" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Pagination
+    const totalPages = j.pagination?.pages || j.totalPages || 1;
+    const pager = qs('#editStudentPager');
+    pager.innerHTML = '';
+    
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, editStudentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    const prevBtn = document.createElement('button');
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+    prevBtn.disabled = editStudentPage === 1;
+    prevBtn.onclick = () => {
+      if (editStudentPage > 1) {
+        editStudentPage--;
+        loadStudentsForEditing();
+      }
+    };
+    pager.appendChild(prevBtn);
+    
+    if (startPage > 1) {
+      const btn1 = document.createElement('button');
+      btn1.textContent = '1';
+      btn1.onclick = () => {
+        editStudentPage = 1;
+        loadStudentsForEditing();
+      };
+      pager.appendChild(btn1);
+      
+      if (startPage > 2) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = i === editStudentPage ? 'active' : '';
+      btn.onclick = () => {
+        editStudentPage = i;
+        loadStudentsForEditing();
+      };
+      pager.appendChild(btn);
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '8px 4px';
+        dots.style.display = 'flex';
+        dots.style.alignItems = 'center';
+        pager.appendChild(dots);
+      }
+      
+      const btnLast = document.createElement('button');
+      btnLast.textContent = totalPages;
+      btnLast.onclick = () => {
+        editStudentPage = totalPages;
+        loadStudentsForEditing();
+      };
+      pager.appendChild(btnLast);
+    }
+    
+    const nextBtn = document.createElement('button');
+    nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = editStudentPage === totalPages;
+    nextBtn.onclick = () => {
+      if (editStudentPage < totalPages) {
+        editStudentPage++;
+        loadStudentsForEditing();
+      }
+    };
+    pager.appendChild(nextBtn);
+    
+    const pageInfo = document.createElement('div');
+    pageInfo.style.width = '100%';
+    pageInfo.style.textAlign = 'center';
+    pageInfo.style.marginTop = '10px';
+    pageInfo.style.fontSize = '0.9rem';
+    pageInfo.style.color = '#666';
+    pageInfo.innerHTML = `Page <strong>${editStudentPage}</strong> of <strong>${totalPages}</strong> | Total Students: <strong>${j.pagination?.total || j.count}</strong>`;
+    pager.appendChild(pageInfo);
+  } catch (e) {
+    console.error('Load students for editing error:', e);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Failed to load students</p>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+async function saveStudentName(studentId) {
+  try {
+    const nameInput = qs(`#name_${studentId}`);
+    const newName = nameInput.value.trim();
+
+    if (!newName) {
+      alert('Student name cannot be empty');
+      return;
+    }
+
+    const res = await fetch(`${API}/admin/edit/students/${studentId}`, {
+      method: 'PUT',
+      headers: headers(),
+      body: JSON.stringify({ name: newName })
+    });
+
+    const j = await res.json();
+    if (j.success) {
+      alert('Student name updated successfully!');
+      loadStudentsForEditing();
+      loadEditStudentStats();
+    } else {
+      alert('Failed to update name: ' + (j.message || 'Unknown error'));
+    }
+  } catch (e) {
+    console.error('Save student name error:', e);
+    alert('Failed to save student name');
+  }
+}
+
+async function saveAllStudentNamesOnCurrentPage() {
+  try {
+    const tbody = qs('#editStudentTable tbody');
+    const rows = tbody.querySelectorAll('tr');
+    
+    if (rows.length === 0) {
+      alert('No students on this page to save');
+      return;
+    }
+
+    const students = [];
+    let hasAnyChanges = false;
+
+    rows.forEach(row => {
+      const nameInput = row.querySelector('input[id*="name_"]');
+
+      if (nameInput) {
+        let studentId = nameInput.id.replace('name_', '');
+        const name = nameInput.value.trim();
+
+        if (name) {
+          hasAnyChanges = true;
+          students.push({
+            studentId,
+            name
+          });
+        }
+      }
+    });
+
+    if (!hasAnyChanges) {
+      alert('No student names to save');
+      return;
+    }
+
+    // Validate all names
+    for (const student of students) {
+      if (!student.name || student.name.length === 0) {
+        alert('Student name cannot be empty');
+        return;
+      }
+    }
+
+    const btn = qs('#saveAllEditBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving all changes...';
+
+    const res = await fetch(`${API}/admin/edit/students/batch`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ students })
+    });
+
+    const j = await res.json();
+    if (j.success) {
+      alert(`✓ Success! Updated ${j.data.successCount} out of ${j.data.total} students on this page.${j.data.failureCount > 0 ? '\n' + j.data.failureCount + ' failed.' : ''}`);
+      loadStudentsForEditing();
+      loadEditStudentStats();
+    } else {
+      alert('Failed to save changes: ' + (j.message || 'Unknown error'));
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  } catch (e) {
+    console.error('Save all student names error:', e);
+    alert('Failed to save changes');
+    const btn = qs('#saveAllEditBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Save All Changes on This Page';
+  }
+}
+
+// Event listeners for edit student
+if (qs('#editStudentClassFilter')) {
+  qs('#editStudentClassFilter').onchange = () => {
+    editStudentClassFilter = qs('#editStudentClassFilter').value;
+    editStudentPage = 1;
+    loadStudentsForEditing();
+  };
+}
+
+if (qs('#editStudentSubjectFilter')) {
+  qs('#editStudentSubjectFilter').onchange = () => {
+    editStudentSubjectFilter = qs('#editStudentSubjectFilter').value;
+    editStudentPage = 1;
+    loadStudentsForEditing();
+  };
+}
+
+if (qs('#refreshEditStatsBtn')) {
+  qs('#refreshEditStatsBtn').onclick = loadEditStudentStats;
+}
+
+if (qs('#saveAllEditBtn')) {
+  qs('#saveAllEditBtn').onclick = saveAllStudentNamesOnCurrentPage;
+}
+
+// ===============================
+// MESSAGING SYSTEM
+// ===============================
+
+async function sendMessageToCoordinators() {
+  const messageContent = qs('#messageContent').value.trim();
+  
+  if (!messageContent) {
+    alert('Please write a message before sending');
+    return;
+  }
+
+  const btn = qs('#sendMessageBtn');
+  const statusDiv = qs('#messageStatus');
+  
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  statusDiv.style.display = 'block';
+  statusDiv.textContent = '⏳ Sending message to all coordinators...';
+
+  try {
+    const res = await fetch(API + '/admin/send-message-to-coordinators', {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ message: messageContent })
+    });
+
+    const j = await res.json();
+
+    if (j.success) {
+      statusDiv.style.background = 'rgba(16, 185, 129, 0.3)';
+      statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✓ Message sent successfully to ${j.data.successCount} coordinators`;
+      qs('#messageContent').value = '';
+      
+      // Reset after 5 seconds
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+        statusDiv.style.background = 'rgba(255,255,255,0.2)';
+      }, 5000);
+    } else {
+      statusDiv.style.background = 'rgba(239, 68, 68, 0.3)';
+      statusDiv.innerHTML = `<i class="fas fa-times-circle"></i> ✗ Failed: ${j.message || 'Unknown error'}`;
+    }
+  } catch (e) {
+    console.error('Send message error:', e);
+    statusDiv.style.background = 'rgba(239, 68, 68, 0.3)';
+    statusDiv.innerHTML = `<i class="fas fa-times-circle"></i> ✗ Error sending message`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message to All';
+  }
+}
+
+if (qs('#sendMessageBtn')) {
+  qs('#sendMessageBtn').onclick = sendMessageToCoordinators;
+}
+
+// ============================================
+// REPORT CARDS & CERTIFICATES MANAGEMENT
+// ============================================
+
+async function releaseAll() {
+  if (!confirm('Release both Report Cards & Certificates to all students? This will make them visible in their dashboard.')) {
+    return;
+  }
+  
+  const btn = qs('#releaseAllBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  
+  try {
+    // Release both report cards and certificates
+    const resReports = await fetch(API + '/admin/results/release-report-cards', {
+      method: 'POST',
+      headers: headers()
+    });
+    
+    const resCerts = await fetch(API + '/admin/results/release-certificates', {
+      method: 'POST',
+      headers: headers()
+    });
+    
+    const j1 = await resReports.json();
+    const j2 = await resCerts.json();
+    const statusDiv = qs('#reportStatusMessage');
+    
+    if (j1.success && j2.success) {
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = 'rgba(16, 185, 129, 0.3)';
+      statusDiv.style.color = '#065f46';
+      statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✓ Report Cards & Certificates Released Successfully!`;
+    } else {
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = 'rgba(239, 68, 68, 0.3)';
+      statusDiv.style.color = '#7f1d1d';
+      statusDiv.innerHTML = `<i class="fas fa-times-circle"></i> ✗ ${j1.message || j2.message}`;
+    }
+  } catch (error) {
+    console.error('Release Error:', error);
+    qs('#reportStatusMessage').style.display = 'block';
+    qs('#reportStatusMessage').style.background = 'rgba(239, 68, 68, 0.3)';
+    qs('#reportStatusMessage').style.color = '#7f1d1d';
+    qs('#reportStatusMessage').innerHTML = `<i class="fas fa-times-circle"></i> ✗ Error releasing documents`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-unlock"></i> Release';
+  }
+}
+
+async function stopAll() {
+  if (!confirm('Stop Report Cards & Certificates? Students will no longer be able to see results.')) {
+    return;
+  }
+  
+  const btn = qs('#stopAllBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  
+  try {
+    // Stop both report cards and certificates
+    const resReports = await fetch(API + '/admin/results/stop-report-cards', {
+      method: 'POST',
+      headers: headers()
+    });
+    
+    const resCerts = await fetch(API + '/admin/results/stop-certificates', {
+      method: 'POST',
+      headers: headers()
+    });
+    
+    const j1 = await resReports.json();
+    const j2 = await resCerts.json();
+    const statusDiv = qs('#reportStatusMessage');
+    
+    if (j1.success && j2.success) {
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = 'rgba(239, 68, 68, 0.3)';
+      statusDiv.style.color = '#7f1d1d';
+      statusDiv.innerHTML = `<i class="fas fa-lock"></i> ✓ Report Cards & Certificates Stopped`;
+    } else {
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = 'rgba(239, 68, 68, 0.3)';
+      statusDiv.style.color = '#7f1d1d';
+      statusDiv.innerHTML = `<i class="fas fa-times-circle"></i> ✗ ${j1.message || j2.message}`;
+    }
+  } catch (error) {
+    console.error('Stop Error:', error);
+    qs('#reportStatusMessage').style.display = 'block';
+    qs('#reportStatusMessage').style.background = 'rgba(239, 68, 68, 0.3)';
+    qs('#reportStatusMessage').style.color = '#7f1d1d';
+    qs('#reportStatusMessage').innerHTML = `<i class="fas fa-times-circle"></i> ✗ Error stopping documents`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Stop';
+  }
+}
+
+// Attach event listeners
+if (qs('#releaseAllBtn')) {
+  qs('#releaseAllBtn').onclick = releaseAll;
+}
+if (qs('#stopAllBtn')) {
+  qs('#stopAllBtn').onclick = stopAll;
+}
+
 // Initialize
 loadStats();
 loadRegs();
 loadRegistrationStatus();
 loadAdmitCardStats();
 loadAdmitCards();
+loadResultEntryStats();
+loadResultsForEntry();
+loadEditStudentStats();
+loadStudentsForEditing();
 </script>
 </body>
 </html>
