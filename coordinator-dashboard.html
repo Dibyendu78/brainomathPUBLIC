@@ -1265,106 +1265,7 @@
             </div>
         </div>
 
-        <!-- Student Results & Downloads Section (MOVED BEFORE STUDENT MANAGEMENT) -->
-        <div class="content-card" id="studentResultsCard" style="display: none; margin-top: 30px;">
-            <div class="card-header">
-                <h2>
-                    <i class="fas fa-chart-bar header-icon"></i>
-                    Student Results & Downloads
-                </h2>
-                <p style="margin-top: 5px; color: #666; font-size: 0.95rem;">
-                    View student exam results, download Score cards and participation certificates
-                </p>
-            </div>
-            <div class="card-content">
-                <!-- Filters -->
-                <div class="controls"
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <div class="filter-group">
-                        <label for="resultsClassFilter" style="display: block; margin-bottom: 5px; font-weight: 500;">
-                            <i class="fas fa-graduation-cap"></i> Filter by Class:
-                        </label>
-                        <select id="resultsClassFilter"
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="">All Classes</option>
-                            <option value="3">Class 3</option>
-                            <option value="4">Class 4</option>
-                            <option value="5">Class 5</option>
-                            <option value="6">Class 6</option>
-                            <option value="7">Class 7</option>
-                            <option value="8">Class 8</option>
-                            <option value="9">Class 9</option>
-                            <option value="10">Class 10</option>
-                            <option value="11">Class 11</option>
-                            <option value="12">Class 12</option>
-                        </select>
-                    </div>
 
-                    <div class="filter-group">
-                        <label for="resultsSubjectFilter" style="display: block; margin-bottom: 5px; font-weight: 500;">
-                            <i class="fas fa-book"></i> Filter by Subject:
-                        </label>
-                        <select id="resultsSubjectFilter"
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="">All Subjects</option>
-                            <option value="math">Mathematics</option>
-                            <option value="science">Science</option>
-                            <option value="both">Both</option>
-                        </select>
-                    </div>
-
-                    <div style="display: flex; align-items: flex-end;">
-                        <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
-                            <button id="downloadReportCardsBtn" class="btn btn-success"
-                                onclick="downloadAllReportCards()" style="flex:1;">
-                                <i class="fas fa-download"></i> Download All Score Cards
-                            </button>
-
-                            <button id="downloadCertificatesBtn" onclick="downloadAllCertificates()"
-                                class="btn btn-success">
-                                <i class="fas fa-download"></i> Download All Certificates
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Results Table -->
-                <div class="table-container" style="overflow-x: auto;">
-                    <table id="resultsTable" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                        <thead>
-                            <tr style="background: #f3f4f6; border-bottom: 2px solid #ddd;">
-                                <th style="padding: 12px; text-align: left; font-weight: 600;"><i
-                                        class="fas fa-hashtag"></i> Roll</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600;"><i
-                                        class="fas fa-user"></i> Student</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600;"><i
-                                        class="fas fa-graduation-cap"></i> Class</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600;"><i
-                                        class="fas fa-book"></i> Subject</th>
-                                <th style="padding: 12px; text-align: center; font-weight: 600;"><i
-                                        class="fas fa-calculator"></i> Math</th>
-                                <th style="padding: 12px; text-align: center; font-weight: 600;"><i
-                                        class="fas fa-flask"></i> Science</th>
-                                <th style="padding: 12px; text-align: center; font-weight: 600;"><i
-                                        class="fas fa-download"></i> Downloads</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                            <tr>
-                                <td colspan="7" style="padding: 20px; text-align: center; color: #999;">
-                                    Loading student results...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Results pagination -->
-                <div id="resultsPagination"
-                    style="display: flex; justify-content: center; gap: 5px; margin-top: 20px; flex-wrap: wrap;"></div>
-            </div>
-        </div>
 
         <!-- Student Management -->
         <div class="content-card" id="studentManagementCard">
@@ -1791,89 +1692,11 @@
         }
 
         async function downloadAllReportCards() {
-            const btn = document.getElementById('downloadReportCardsBtn');
-            btn.disabled = true;
-            const old = btn.innerHTML;
-            btn.innerHTML = '<span class="loading-spinner"></span> Preparing...';
-            try {
-                const resp = await fetch(`${API}/coordinator/results/download-report-cards`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
-                });
-
-                if (!resp.ok) {
-                    const j = await resp.json().catch(() => ({ message: 'Failed' }));
-                    alert(j.message || 'Failed to prepare report cards');
-                    return;
-                }
-
-                const blob = await resp.blob();
-                const disp = resp.headers.get('content-disposition');
-                let filename = 'report-cards.pdf';
-                if (disp) {
-                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
-                    if (m) filename = decodeURIComponent(m[1]);
-                }
-
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-
-            } catch (e) {
-                console.error(e);
-                alert('Error downloading report cards');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = old;
-            }
+            alert('Report cards viewing has been moved to the Result View page. Please go to the home page and click "View Results".');
         }
 
         async function downloadAllCertificates() {
-            const btn = document.getElementById('downloadCertificatesBtn');
-            btn.disabled = true;
-            const old = btn.innerHTML;
-            btn.innerHTML = '<span class="loading-spinner"></span> Preparing...';
-            try {
-                const resp = await fetch(`${API}/coordinator/results/download-certificates`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
-                });
-
-                if (!resp.ok) {
-                    const j = await resp.json().catch(() => ({ message: 'Failed' }));
-                    alert(j.message || 'Failed to prepare certificates');
-                    return;
-                }
-
-                const blob = await resp.blob();
-                const disp = resp.headers.get('content-disposition');
-                let filename = 'certificates.pdf';
-                if (disp) {
-                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
-                    if (m) filename = decodeURIComponent(m[1]);
-                }
-
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-
-            } catch (e) {
-                console.error(e);
-                alert('Error downloading certificates');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = old;
-            }
+            alert('Certificate downloading has been moved to the Result View page. Please go to the home page and click "View Results".');
         }
 
         // ===============================
@@ -2045,14 +1868,6 @@
                     updatePaymentSection();
                     calculateFees();
                     updateLockState();
-
-                    // Load student results if any students exist and payment is submitted
-                    if (isPaymentSubmitted) {
-                        document.getElementById('studentResultsCard').style.display = 'block';
-                        loadStudentResults();
-                    } else {
-                        document.getElementById('studentResultsCard').style.display = 'none';
-                    }
 
                     document.getElementById('loadingState').style.display = 'none';
                 } else {
@@ -2912,199 +2727,9 @@
         // Admit card feature removed — related UI and scripts have been deleted.
 
         // ===============================
-        // Student Results Management
-        // ===============================
-        let resultsData = [];
-        let currentResultsPage = 1;
-        const resultsPerPage = 10;
-        let resultsVisible = false;
-
-        // Check if results are released
-        async function checkResultsVisibility() {
-            try {
-                const res = await fetch(`${API}/admin/results/status`);
-                const j = await res.json();
-
-                if (j.success) {
-                    resultsVisible = j.data.resultsVisible;
-                    const resultsCard = document.getElementById('studentResultsCard');
-
-                    if (resultsCard) {
-                        resultsCard.style.display = resultsVisible ? 'block' : 'none';
-                    }
-
-                    // If results are visible, load them
-                    if (resultsVisible) {
-                        loadStudentResults();
-                    }
-                }
-            } catch (error) {
-                console.error('Check Results Visibility Error:', error);
-                const resultsCard = document.getElementById('studentResultsCard');
-                if (resultsCard) {
-                    resultsCard.style.display = 'none';
-                }
-            }
-        }
-
-        async function loadStudentResults() {
-            try {
-                const classFilter = document.getElementById('resultsClassFilter')?.value || '';
-                const subjectFilter = document.getElementById('resultsSubjectFilter')?.value || '';
-
-                let url = `${API}/coordinator/student-results`;
-                const params = new URLSearchParams();
-                if (classFilter) params.append('class', classFilter);
-                if (subjectFilter) params.append('subject', subjectFilter);
-
-                if (params.toString()) {
-                    url += '?' + params.toString();
-                }
-
-                console.log('📊 Fetching results from:', url);
-                console.log('🔐 Token:', coordinatorToken ? 'Present' : 'Missing');
-
-                const res = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${coordinatorToken}`
-                    }
-                });
-
-                const j = await res.json();
-                console.log('📥 Results Response:', j);
-
-                if (j.success) {
-                    resultsData = j.data || [];
-                    console.log('✓ Loaded', resultsData.length, 'students');
-                    currentResultsPage = 1;
-                    displayResultsTable();
-                } else {
-                    console.error('❌ API Error:', j.message);
-                    document.getElementById('resultsTableBody').innerHTML = `
-                <tr>
-                  <td colspan="7" style="padding: 20px; text-align: center; color: #999;">
-                    ${j.message || 'No results available'}
-                  </td>
-                </tr>
-              `;
-                }
-            } catch (error) {
-                console.error('❌ Load Results Error:', error);
-                document.getElementById('resultsTableBody').innerHTML = `
-              <tr>
-                <td colspan="7" style="padding: 20px; text-align: center; color: #c00;">
-                  Error loading results: ${error.message}
-                </td>
-              </tr>
-            `;
-            }
-        }
-
-        function displayResultsTable() {
-            const startIdx = (currentResultsPage - 1) * resultsPerPage;
-            const endIdx = startIdx + resultsPerPage;
-            const pageData = resultsData.slice(startIdx, endIdx);
-
-            if (pageData.length === 0) {
-                document.getElementById('resultsTableBody').innerHTML = `
-              <tr>
-                <td colspan="7" style="padding: 20px; text-align: center; color: #999;">
-                  No students found
-                </td>
-              </tr>
-            `;
-                return;
-            }
-
-            document.getElementById('resultsTableBody').innerHTML = pageData.map(student => `
-            <tr style="border-bottom: 1px solid #eee; hover: background #f9f9f9;">
-              <td style="padding: 12px;">${student.rollNumber || '-'}</td>
-              <td style="padding: 12px;">${student.name}</td>
-              <td style="padding: 12px;">Class ${student.class}</td>
-              <td style="padding: 12px;">${formatSubjects(student.subjects)}</td>
-              <td style="padding: 12px; text-align: center;">
-                ${student.marks?.math !== null && student.marks?.math !== undefined ? student.marks.math : '-'}/60
-              </td>
-              <td style="padding: 12px; text-align: center;">
-                ${student.marks?.science !== null && student.marks?.science !== undefined ? student.marks.science : '-'}/60
-              </td>
-              <td style="padding: 12px; text-align: center;">
-                <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
-                  <button onclick="downloadReportCard('${student._id}')" class="btn" style="background: #3b82f6; color: white; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border: none; border-radius: 4px; white-space: nowrap;">
-                    <i class="fas fa-download"></i> Score Card
-                  </button>
-                  <button onclick="downloadCertificate('${student._id}')" class="btn" style="background: #10b981; color: white; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border: none; border-radius: 4px; white-space: nowrap;">
-                    <i class="fas fa-download"></i> Certificate
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `).join('');
-
-            displayResultsPagination();
-        }
-
-        function displayResultsPagination() {
-            const totalPages = Math.ceil(resultsData.length / resultsPerPage);
-            const paginationDiv = document.getElementById('resultsPagination');
-            paginationDiv.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement('button');
-                btn.textContent = i;
-                btn.style.padding = '6px 10px';
-                btn.style.border = i === currentResultsPage ? '2px solid #3b82f6' : '1px solid #ddd';
-                btn.style.background = i === currentResultsPage ? '#3b82f6' : 'white';
-                btn.style.color = i === currentResultsPage ? 'white' : '#666';
-                btn.style.borderRadius = '4px';
-                btn.style.cursor = 'pointer';
-                btn.onclick = () => {
-                    currentResultsPage = i;
-                    displayResultsTable();
-                };
-                paginationDiv.appendChild(btn);
-            }
-        }
-
-        async function downloadReportCard(studentId) {
-            try {
-                window.location.href = `${API}/admin/results/download-report-card/${studentId}`;
-            } catch (error) {
-                console.error('Download Report Card Error:', error);
-                alert('Failed to download report card');
-            }
-        }
-
-        async function downloadCertificate(studentId) {
-            try {
-                window.location.href = `${API}/admin/results/download-certificate/${studentId}`;
-            } catch (error) {
-                console.error('Download Certificate Error:', error);
-                alert('Failed to download certificate');
-            }
-        }
-
-        // Attach event listeners for results filters
-        if (document.getElementById('resultsClassFilter')) {
-            document.getElementById('resultsClassFilter').onchange = () => {
-                checkResultsVisibility();
-                loadStudentResults();
-            };
-        }
-        if (document.getElementById('resultsSubjectFilter')) {
-            document.getElementById('resultsSubjectFilter').onchange = () => {
-                checkResultsVisibility();
-                loadStudentResults();
-            };
-        }
-        if (document.getElementById('refreshResultsBtn')) {
-            document.getElementById('refreshResultsBtn').onclick = () => {
-                checkResultsVisibility();
-                loadStudentResults();
-            };
-        }
+        // Student Results - MOVED TO result-view.html
+        // =============================== 
+        // Results viewing functionality has been moved to the dedicated result-view.html page
 
         // ===============================
         // Logout Function
@@ -3120,13 +2745,7 @@
         // ===============================
         document.addEventListener('DOMContentLoaded', function () {
             loadDashboard();
-            checkResultsVisibility();
-
-            // Auto-refresh results visibility every 30 seconds
-            setInterval(checkResultsVisibility, 30000);
         });
-
-        // Dashboard initialization unchanged
 
     </script>
 </body>
