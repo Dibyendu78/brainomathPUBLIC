@@ -476,6 +476,7 @@
             from {
                 transform: rotate(0deg);
             }
+
             to {
                 transform: rotate(360deg);
             }
@@ -526,6 +527,7 @@
 
         /* Print Styles */
         @media print {
+
             .header,
             .btn,
             .controls,
@@ -566,6 +568,7 @@
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -577,6 +580,7 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+
             to {
                 transform: translateX(400px);
                 opacity: 0;
@@ -659,8 +663,8 @@
                     </div>
 
                     <div style="display: flex; gap: var(--space-2); flex-direction: column;">
-                        <button id="downloadReportCardsBtn" class="btn btn-success"
-                            onclick="downloadAllReportCards()" style="flex:1;">
+                        <button id="downloadReportCardsBtn" class="btn btn-success" onclick="downloadAllReportCards()"
+                            style="flex:1;">
                             <i class="fas fa-download"></i> Download All Score Cards
                         </button>
 
@@ -706,7 +710,7 @@
         // Configuration
         // ===============================
         const API = 'https://brain-o-math.onrender.com/api';
-        
+
         // ===============================
         // Global variables
         // ===============================
@@ -766,12 +770,12 @@
 
             const notificationDiv = document.createElement('div');
             notificationDiv.className = `notification notification-${type}`;
-            
+
             let icon = 'fa-info-circle';
             if (type === 'success') icon = 'fa-check-circle';
             if (type === 'error') icon = 'fa-exclamation-circle';
             if (type === 'warning') icon = 'fa-exclamation-triangle';
-            
+
             notificationDiv.innerHTML = `
                 <i class="fas ${icon}"></i>
                 <span>${message}</span>
@@ -779,7 +783,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             `;
-            
+
             notificationDiv.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -995,7 +999,7 @@
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                
+
                 showNotification('Report card downloaded successfully', 'success');
             } catch (error) {
                 console.error('Download Report Card Error:', error);
@@ -1018,7 +1022,15 @@
 
                 const blob = await resp.blob();
                 const disp = resp.headers.get('content-disposition');
+                const student = getStudentById(studentId);
+
                 let filename = 'certificate.pdf';
+                if (student) {
+                    const roll = safeFileName(student.rollNumber || 'ROLL');
+                    const name = safeFileName(student.name || 'STUDENT');
+                    filename = `${roll}_${name}_Certificate.pdf`;
+                }
+
                 if (disp) {
                     const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
                     if (m) filename = decodeURIComponent(m[1]);
@@ -1032,7 +1044,7 @@
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                
+
                 showNotification('Certificate downloaded successfully', 'success');
             } catch (error) {
                 console.error('Download Certificate Error:', error);
@@ -1059,7 +1071,15 @@
 
                 const blob = await resp.blob();
                 const disp = resp.headers.get('content-disposition');
-                let filename = 'report-cards.pdf';
+                const student = getStudentById(studentId);
+
+                let filename = 'report-card.pdf';
+                if (student) {
+                    const roll = safeFileName(student.rollNumber || 'ROLL');
+                    const name = safeFileName(student.name || 'STUDENT');
+                    filename = `${roll}_${name}_ReportCard.pdf`;
+                }
+
                 if (disp) {
                     const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
                     if (m) filename = decodeURIComponent(m[1]);
