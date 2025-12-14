@@ -757,6 +757,85 @@
             }, 3000);
         }
 
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = `notification notification-${type}`;
+            
+            let icon = 'fa-info-circle';
+            if (type === 'success') icon = 'fa-check-circle';
+            if (type === 'error') icon = 'fa-exclamation-circle';
+            if (type === 'warning') icon = 'fa-exclamation-triangle';
+            
+            notificationDiv.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 20px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                animation: slideInRight 0.3s ease-out;
+                max-width: 400px;
+            `;
+
+            // Set colors based on type
+            const colors = {
+                success: { bg: '#d4edda', text: '#155724', border: '#c3e6cb' },
+                error: { bg: '#f8d7da', text: '#721c24', border: '#f5c6cb' },
+                warning: { bg: '#fff3cd', text: '#856404', border: '#ffeeba' },
+                info: { bg: '#d1ecf1', text: '#0c5460', border: '#bee5eb' }
+            };
+
+            const color = colors[type] || colors.info;
+            notificationDiv.style.backgroundColor = color.bg;
+            notificationDiv.style.color = color.text;
+            notificationDiv.style.borderLeft = `4px solid ${color.border}`;
+
+            // Style the close button
+            const closeBtn = notificationDiv.querySelector('.notification-close');
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: inherit;
+                cursor: pointer;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                font-size: 16px;
+                margin-left: 8px;
+            `;
+
+            document.body.appendChild(notificationDiv);
+
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                notificationDiv.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (notificationDiv.parentNode) {
+                        notificationDiv.parentNode.removeChild(notificationDiv);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
         // ===============================
         // Load Dashboard
         // ===============================
@@ -889,19 +968,75 @@
 
         async function downloadReportCard(studentId) {
             try {
-                window.location.href = `${API}/admin/results/download-report-card/${studentId}`;
+                const resp = await fetch(`${API}/admin/results/download-report-card/${studentId}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
+                });
+
+                if (!resp.ok) {
+                    const errorData = await resp.json().catch(() => ({ message: 'Failed to download report card' }));
+                    showNotification(errorData.message || 'Failed to download report card', 'error');
+                    return;
+                }
+
+                const blob = await resp.blob();
+                const disp = resp.headers.get('content-disposition');
+                let filename = 'report-card.pdf';
+                if (disp) {
+                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
+                    if (m) filename = decodeURIComponent(m[1]);
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                
+                showNotification('Report card downloaded successfully', 'success');
             } catch (error) {
                 console.error('Download Report Card Error:', error);
-                alert('Failed to download report card');
+                showNotification('Error downloading report card: ' + error.message, 'error');
             }
         }
 
         async function downloadCertificate(studentId) {
             try {
-                window.location.href = `${API}/admin/results/download-certificate/${studentId}`;
+                const resp = await fetch(`${API}/admin/results/download-certificate/${studentId}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
+                });
+
+                if (!resp.ok) {
+                    const errorData = await resp.json().catch(() => ({ message: 'Failed to download certificate' }));
+                    showNotification(errorData.message || 'Failed to download certificate', 'error');
+                    return;
+                }
+
+                const blob = await resp.blob();
+                const disp = resp.headers.get('content-disposition');
+                let filename = 'certificate.pdf';
+                if (disp) {
+                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
+                    if (m) filename = decodeURIComponent(m[1]);
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                
+                showNotification('Certificate downloaded successfully', 'success');
             } catch (error) {
                 console.error('Download Certificate Error:', error);
-                alert('Failed to download certificate');
+                showNotification('Error downloading certificate: ' + error.message, 'error');
             }
         }
 
