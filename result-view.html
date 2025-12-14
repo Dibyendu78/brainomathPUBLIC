@@ -968,16 +968,8 @@
 
         async function downloadReportCard(studentId) {
             try {
-                // Get student data to include name and roll number in filename
-                const studentResp = await fetch(`${API}/admin/results/student/${studentId}`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
-                }).catch(() => null);
-
-                let studentData = null;
-                if (studentResp && studentResp.ok) {
-                    studentData = await studentResp.json();
-                }
+                // Get student data from already loaded resultsData
+                const studentData = resultsData.find(s => s._id === studentId);
 
                 const resp = await fetch(`${API}/admin/results/download-report-card/${studentId}`, {
                     method: 'GET',
@@ -991,7 +983,6 @@
                 }
 
                 const blob = await resp.blob();
-                const disp = resp.headers.get('content-disposition');
                 let filename = 'report-card.pdf';
                 
                 // Generate filename with student name and roll number
@@ -999,9 +990,6 @@
                     const name = (studentData.name || 'Student').replace(/[^a-z0-9]/gi, '_').toLowerCase();
                     const rollNum = studentData.rollNumber || 'unknown';
                     filename = `${name}_${rollNum}_report-card.pdf`;
-                } else if (disp) {
-                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
-                    if (m) filename = decodeURIComponent(m[1]);
                 }
 
                 const url = window.URL.createObjectURL(blob);
@@ -1022,16 +1010,8 @@
 
         async function downloadCertificate(studentId) {
             try {
-                // Get student data to include name and roll number in filename
-                const studentResp = await fetch(`${API}/admin/results/student/${studentId}`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${coordinatorToken}` }
-                }).catch(() => null);
-
-                let studentData = null;
-                if (studentResp && studentResp.ok) {
-                    studentData = await studentResp.json();
-                }
+                // Get student data from already loaded resultsData
+                const studentData = resultsData.find(s => s._id === studentId);
 
                 const resp = await fetch(`${API}/admin/results/download-certificate/${studentId}`, {
                     method: 'GET',
@@ -1045,7 +1025,6 @@
                 }
 
                 const blob = await resp.blob();
-                const disp = resp.headers.get('content-disposition');
                 let filename = 'certificate.pdf';
                 
                 // Generate filename with student name and roll number
@@ -1053,9 +1032,6 @@
                     const name = (studentData.name || 'Student').replace(/[^a-z0-9]/gi, '_').toLowerCase();
                     const rollNum = studentData.rollNumber || 'unknown';
                     filename = `${name}_${rollNum}_certificate.pdf`;
-                } else if (disp) {
-                    const m = /filename\*=UTF-8''(.+)$/.exec(disp) || /filename="?([^";]+)"?/.exec(disp);
-                    if (m) filename = decodeURIComponent(m[1]);
                 }
 
                 const url = window.URL.createObjectURL(blob);
