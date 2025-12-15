@@ -919,30 +919,47 @@
                 return;
             }
 
-            document.getElementById('resultsTableBody').innerHTML = pageData.map(student => `
+            document.getElementById('resultsTableBody').innerHTML = pageData.map(student => {
+                // Check which subjects the student selected
+                const selectedMath = student.subjects === 'math' || student.subjects === 'both';
+                const selectedScience = student.subjects === 'science' || student.subjects === 'both';
+                
+                // Format marks with subject selection check
+                const mathDisplay = selectedMath 
+                    ? (student.marks?.math !== null && student.marks?.math !== undefined ? `${student.marks.math}/60` : '-/60')
+                    : 'N/A';
+                const scienceDisplay = selectedScience 
+                    ? (student.marks?.science !== null && student.marks?.science !== undefined ? `${student.marks.science}/60` : '-/60')
+                    : 'N/A';
+                
+                // Check if student is absent (no marks entered for any subject)
+                const isAbsent = student.marks?.math === null && student.marks?.science === null;
+                
+                return `
                 <tr>
                     <td>${student.rollNumber || '-'}</td>
                     <td>${student.name}</td>
                     <td>Class ${student.class}</td>
                     <td>${formatSubjects(student.subjects)}</td>
                     <td style="text-align: center;">
-                        ${student.marks?.math !== null && student.marks?.math !== undefined ? student.marks.math : '-'}/60
+                        ${mathDisplay}
                     </td>
                     <td style="text-align: center;">
-                        ${student.marks?.science !== null && student.marks?.science !== undefined ? student.marks.science : '-'}/60
+                        ${scienceDisplay}
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button onclick="downloadReportCard('${student._id}')" class="download-btn" title="Download Score Card">
+                            <button onclick="downloadReportCard('${student._id}')" class="download-btn" title="${isAbsent ? 'Student was absent - cannot download' : 'Download Score Card'}" ${isAbsent ? 'disabled' : ''}>
                                 <i class="fas fa-download"></i> Score Card
                             </button>
-                            <button onclick="downloadCertificate('${student._id}')" class="download-btn" title="Download Certificate">
+                            <button onclick="downloadCertificate('${student._id}')" class="download-btn" title="${isAbsent ? 'Student was absent - cannot download' : 'Download Certificate'}" ${isAbsent ? 'disabled' : ''}>
                                 <i class="fas fa-download"></i> Certificate
                             </button>
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
             displayResultsPagination();
         }
