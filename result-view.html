@@ -706,7 +706,7 @@
         // Configuration
         // ===============================
         const API = 'https://brain-o-math.onrender.com/api';
-        
+        //const API = 'http://localhost:5000/api'
         // ===============================
         // Global variables
         // ===============================
@@ -920,20 +920,24 @@
             }
 
             document.getElementById('resultsTableBody').innerHTML = pageData.map(student => {
-                // Check which subjects the student selected
-                const selectedMath = student.subjects === 'math' || student.subjects === 'both';
-                const selectedScience = student.subjects === 'science' || student.subjects === 'both';
-                
+                // Normalize subject choice
+                const subjects = (student.subjects || '').toLowerCase();
+                const selectedMath = subjects === 'math' || subjects === 'both';
+                const selectedScience = subjects === 'science' || subjects === 'both';
+
+                const hasMathMarks = selectedMath && student.marks && student.marks.math !== null && student.marks.math !== undefined;
+                const hasScienceMarks = selectedScience && student.marks && student.marks.science !== null && student.marks.science !== undefined;
+
                 // Format marks with subject selection check
                 const mathDisplay = selectedMath 
-                    ? (student.marks?.math !== null && student.marks?.math !== undefined ? `${student.marks.math}/60` : '-/60')
+                    ? (hasMathMarks ? `${student.marks.math}/60` : '-/60')
                     : 'N/A';
                 const scienceDisplay = selectedScience 
-                    ? (student.marks?.science !== null && student.marks?.science !== undefined ? `${student.marks.science}/60` : '-/60')
+                    ? (hasScienceMarks ? `${student.marks.science}/60` : '-/60')
                     : 'N/A';
                 
-                // Check if student is absent (no marks entered for any subject)
-                const isAbsent = student.marks?.math === null && student.marks?.science === null;
+                // Check if student is absent (no marks entered for their chosen subjects)
+                const isAbsent = !hasMathMarks && !hasScienceMarks;
                 
                 return `
                 <tr>
